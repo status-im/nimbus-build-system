@@ -54,6 +54,10 @@ $(NIM_BINARY) update-common: | sanity-checks
 	rm -rf $(NIMBLE_DIR)
 	+ $(MAKE) build-nim
 
+# don't use this target, or you risk updating dependency repos that are not ready to be used in Nimbus
+update-remote:
+	git submodule update --remote
+
 nat-libs: | libminiupnpc.a libnatpmp.a
 
 libminiupnpc.a: | deps
@@ -92,10 +96,6 @@ mrproper: clean
 github-ssh:
 	git config url."git@github.com:".insteadOf "https://github.com/"
 	git submodule foreach --recursive 'git config url."git@github.com:".insteadOf "https://github.com/"'
-
-# don't use this target, or you risk updating dependency repos that are not ready to be used in Nimbus
-update-remote:
-	git submodule update --remote
 
 # runs `git status` in all Git repos
 status: | $(REPOS)
