@@ -1,8 +1,8 @@
-# Build system used by Nimbus and related projects
+# Common parts of the build system used by Nimbus and related projects
 
 ## Prerequisites
 
-GNU make, Bash and the usual POSIX utilities
+GNU Make, Bash and the usual POSIX utilities.
 
 ## License
 
