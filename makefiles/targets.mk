@@ -183,7 +183,7 @@ ifeq ($(OS), Windows_NT)
 #- back to tabs
 #- copied from .appveyor.yml
 #- this is why we can't delete the whole "build" dir in the "clean" target
-fetch-dlls: | build deps
+fetch-dlls: | build
 	cd build && \
 		$(CURL) $(ROCKSDB_URL) && \
 		$(CURL) https://nim-lang.org/download/dlls.zip && \
