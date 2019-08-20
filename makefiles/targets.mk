@@ -189,8 +189,6 @@ fetch-dlls: | build deps
 		$(CURL) https://nim-lang.org/download/dlls.zip && \
 		$(UNZIP) $(ROCKSDB_ARCHIVE) && \
 		cp -a $(ROCKSDB_DIR)/*.dll . && \
-		$(UNZIP) dlls.zip && \
-		mkdir -p ../vendor/nim-beacon-chain/build && \
-		cp -a *.dll ../vendor/nim-beacon-chain/build/
+		$(UNZIP) dlls.zip
 endif
 
