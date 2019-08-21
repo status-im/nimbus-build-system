@@ -85,8 +85,8 @@ $(NIMBLE_DIR): | $(NIM_BINARY)
 
 clean-common:
 	rm -rf build/{*.exe,*.so,*.so.0} vendor/go/bin $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/nimcache nimcache
-	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT)
-	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/libnatpmp clean $(HANDLE_OUTPUT)
+	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT) || true
+	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/libnatpmp clean $(HANDLE_OUTPUT) || true
 
 # dangerous cleaning, because you may have not-yet-pushed branches and commits in those vendor repos you're about to delete
 mrproper: clean
