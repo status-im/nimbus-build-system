@@ -11,8 +11,8 @@
 ## get native Windows paths on Mingw
 #uname | grep -qi mingw && PWD_CMD="pwd -W"
 
-REL_PATH="$(dirname $0)"
-ABS_PATH="$(cd ${REL_PATH}; pwd)"
+export REL_PATH="$(dirname $0)"
+export ABS_PATH="$(cd ${REL_PATH}; pwd)"
 # do we still need this?
 #ABS_PATH_NATIVE="$(cd ${REL_PATH}; ${PWD_CMD})"
 
@@ -35,5 +35,18 @@ export BUILD_OUTPUTS_DIR="${ABS_PATH}/../../../build"
 # change the prompt in shells that source this file
 export PS1="${PS1%\\\$ } [Nimbus env]\\$ "
 
-exec "$@"
+# functions, instead of aliases, to avoid typing long paths (aliases don't seem
+# to be expanded by default for command line arguments)
+nimble() {
+	"${ABS_PATH}/nimble.sh" "$@"
+}
+export -f nimble
+
+add_submodule() {
+	"${ABS_PATH}/add_submodule.sh" "$@"
+}
+export -f add_submodule
+
+# can't use "exec" here if we're getting function names as params
+"$@"
 
