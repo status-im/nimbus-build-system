@@ -11,7 +11,9 @@
 ## get native Windows paths on Mingw
 #uname | grep -qi mingw && PWD_CMD="pwd -W"
 
-export REL_PATH="$(dirname $BASH_SOURCE)"
+# We use ${BASH_SOURCE[0]} instead of $0 to allow sourcing this file
+# and we fall back to a zsh-specific special var to also support zsh.
+export REL_PATH="$(dirname ${BASH_SOURCE[0]:-${(%):-%x}})"
 export ABS_PATH="$(cd ${REL_PATH}; pwd)"
 # do we still need this?
 #ABS_PATH_NATIVE="$(cd ${REL_PATH}; ${PWD_CMD})"
@@ -33,19 +35,26 @@ export NIMBLE_DIR="${ABS_PATH}/../../.nimble"
 export BUILD_OUTPUTS_DIR="${ABS_PATH}/../../../build"
 
 # change the prompt in shells that source this file
-export PS1="${PS1%\\\$ } [Nimbus env]\\$ "
+if [[ -n "$BASH_VERSION" ]]; then
+	export PS1="${PS1%\\\$ } [Nimbus env]\\$ "
+	EXPORT_FUNC="export -f"
+fi
+if [[ -n "$ZSH_VERSION" ]]; then
+	export PS1="[Nimbus env] $PS1"
+	EXPORT_FUNC="export" # doesn't actually work, because Zsh doesn't support exporting functions
+fi
 
 # functions, instead of aliases, to avoid typing long paths (aliases don't seem
 # to be expanded by default for command line arguments)
 nimble() {
 	"${ABS_PATH}/nimble.sh" "$@"
 }
-export -f nimble
+$EXPORT_FUNC nimble
 
 add_submodule() {
 	"${ABS_PATH}/add_submodule.sh" "$@"
 }
-export -f add_submodule
+$EXPORT_FUNC add_submodule
 
 if [[ $# == 1 && $1 == "bash" ]]; then
 	# the only way to change PS1 in a child shell, apparently
