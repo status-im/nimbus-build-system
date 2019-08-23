@@ -24,7 +24,7 @@ export GO111MODULE=on
 
 #- make it an absolute path, so we can call this script from other dirs
 #- we can't use native Windows paths in here, because colons can't be escaped in PATH
-export PATH="${ABS_PATH}/../../Nim/bin:${GOPATH}/bin:${PATH}"
+export PATH="$(realpath ${ABS_PATH}/../../Nim/bin):${GOPATH}/bin:${PATH}"
 
 # Nimble needs this to be an absolute path
 export NIMBLE_DIR="${ABS_PATH}/../../.nimble"
