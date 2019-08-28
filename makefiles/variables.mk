@@ -65,7 +65,7 @@ RUN_CMD_IN_ALL_REPOS = git submodule foreach --recursive --quiet 'echo -e "\n\e[
 # absolute path, since it will be run at various subdirectory depths
 ENV_SCRIPT := "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/env.sh"
 # duplicated in "env.sh" to prepend NIM_DIR/bin to PATH
-NIM_DIR := vendor/Nim
+NIM_DIR := $(BUILD_SYSTEM_DIR)/vendor/Nim
 
 ifeq ($(OS), Windows_NT)
   EXE_SUFFIX := .exe

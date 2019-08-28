@@ -12,7 +12,7 @@
 #uname | grep -qi mingw && PWD_CMD="pwd -W"
 
 # We use ${BASH_SOURCE[0]} instead of $0 to allow sourcing this file
-# and we fall back to a zsh-specific special var to also support zsh.
+# and we fall back to a Zsh-specific special var to also support Zsh.
 export REL_PATH="$(dirname ${BASH_SOURCE[0]:-${(%):-%x}})"
 export ABS_PATH="$(cd ${REL_PATH}; pwd)"
 # do we still need this?
@@ -26,7 +26,7 @@ export GO111MODULE=on
 
 #- make it an absolute path, so we can call this script from other dirs
 #- we can't use native Windows paths in here, because colons can't be escaped in PATH
-export PATH="${ABS_PATH}/../../Nim/bin:${GOPATH}/bin:${PATH}"
+export PATH="${ABS_PATH}/../vendor/Nim/bin:${GOPATH}/bin:${PATH}"
 
 # Nimble needs this to be an absolute path
 export NIMBLE_DIR="${ABS_PATH}/../../.nimble"

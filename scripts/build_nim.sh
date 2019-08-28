@@ -17,8 +17,8 @@ NIMBLE_COMMIT="c8d79fc0228682677330a9f57d14389aaa641153" # Mar 26 10:06:06 2019
 # script arguments
 [[ $# -ne 4 ]] && { echo "usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
 NIM_DIR="$1"
-CSOURCES_DIR="$2"
-NIMBLE_DIR="$3"
+CSOURCES_DIR="$2" # can be relative to NIM_DIR
+NIMBLE_DIR="$3" # can be relative to NIM_DIR
 CI_CACHE="$4"
 
 ## env vars
