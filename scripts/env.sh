@@ -24,9 +24,11 @@ export NIMBUS_ENV_DIR="${ABS_PATH}"
 export GOPATH="${ABS_PATH}/../../go"
 export GO111MODULE=on
 
+export NIM_PATH=$(cd "${ABS_PATH}/../vendor/Nim/bin"; pwd)
+
 #- make it an absolute path, so we can call this script from other dirs
 #- we can't use native Windows paths in here, because colons can't be escaped in PATH
-export PATH="${ABS_PATH}/../vendor/Nim/bin:${GOPATH}/bin:${PATH}"
+export PATH="${NIM_PATH}:${GOPATH}/bin:${PATH}"
 
 # Nimble needs this to be an absolute path
 export NIMBLE_DIR="${ABS_PATH}/../../.nimble"
