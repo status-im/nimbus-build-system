@@ -23,7 +23,7 @@ sanity-checks:
 #  (timestamp-checked) prerequisites here
 #- $(NIM_BINARY) is both a proxy for submodules having been initialised
 #  and a check for the actual compiler build
-deps-common: sanity-checks $(NIM_BINARY) $(NIMBLE_DIR)
+deps-common: sanity-checks $(NIM_BINARY) $(NIMBLE_DIR) nat-libs
 
 #- conditionally re-builds the Nim compiler (not usually needed, because `make update` calls this rule; delete $(NIM_BINARY) to force it)
 #- allows parallel building with the '+' prefix
@@ -60,7 +60,7 @@ update-remote:
 
 nat-libs: | libminiupnpc.a libnatpmp.a
 
-libminiupnpc.a: | deps
+libminiupnpc.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
 	+ [ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc/$@ ] || \
 		$(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=gcc init $@ $(HANDLE_OUTPUT)
@@ -68,7 +68,7 @@ else
 	+ $(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc $@ $(HANDLE_OUTPUT)
 endif
 
-libnatpmp.a: | deps
+libnatpmp.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
 	+ $(MAKE) -C vendor/nim-nat-traversal/vendor/libnatpmp CC=gcc CFLAGS="-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR" $@ $(HANDLE_OUTPUT)
 else
