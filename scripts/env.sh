@@ -24,6 +24,7 @@ export NIMBUS_ENV_DIR="${ABS_PATH}"
 export GOPATH="${ABS_PATH}/../../go"
 export GO111MODULE=on
 
+# looks like oh-my-zsh can't handle dots in PATH
 export NIM_PATH=$(cd "${ABS_PATH}/../vendor/Nim/bin"; pwd)
 
 #- make it an absolute path, so we can call this script from other dirs
