@@ -5,7 +5,7 @@
 # at your option. This file may not be copied, modified, or distributed except
 # according to those terms.
 
-.PHONY: deps-common sanity-checks nat-libs libminiupnpc.a libnatpmp.a clean-common mrproper github-ssh build-nim update-common update-remote status ntags ctags fetch-dlls
+.PHONY: deps-common sanity-checks go-checks nat-libs libminiupnpc.a libnatpmp.a clean-common mrproper github-ssh build-nim update-common update-remote status ntags ctags fetch-dlls
 
 #- when the special ".SILENT" target is present, all recipes are silenced as if they all had a "@" prefix
 #- by setting SILENT_TARGET_PREFIX to a non-empty value, the name of this target becomes meaningless to `make`
@@ -18,6 +18,16 @@ build:
 
 sanity-checks:
 	which $(CC) &>/dev/null || { echo "C compiler ($(CC)) not installed. Aborting."; exit 1; }
+
+MIN_GO_VER := 1.12
+DISABLE_GO_CHECKS := 0
+go-checks:
+ifeq ($(DISABLE_GO_CHECKS), 0)
+	which go &>/dev/null || { echo "Go compiler not installed. Aborting."; exit 1; }
+	GO_VER="$$(go version | sed -E 's/^.*go([0-9.]+).*$$/\1/')"; \
+	       [[ $$(echo -e "$${GO_VER}\n$(MIN_GO_VER)" | sort -t '.' -k 1,1 -k 2,2 -g | head -n 1) == "$(MIN_GO_VER)" ]] || \
+	       { echo "Minimum Go compiler version required: $(MIN_GO_VER). Version available: $$GO_VER. Aborting."; exit 1; }
+endif
 
 #- runs only the first time and after `make update`, so have "normal"
 #  (timestamp-checked) prerequisites here
