@@ -52,13 +52,17 @@ build-nim: | sanity-checks
 		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
 		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
 
-#- in case of submodule URL changes, it propagates that change in the parent repo's .git directory
+#- "go.mod" can be changed by the Go compiler, preventing a checkout
+#- in case of submodule URL changes, propagates that change in the parent repo's .git directory
 #- initialises and updates the Git submodules, avoiding automated LFS downloads
 #- manages the AppVeyor cache of Nim compiler binaries
 #- deletes the ".nimble" dir to force the execution of the "deps" target
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY) update-common: | sanity-checks
+	[[ -e vendor/go/src/github.com/libp2p/go-libp2p-daemon ]] && \
+		cd vendor/go/src/github.com/libp2p/go-libp2p-daemon && \
+		git reset --hard -q HEAD
 	git submodule sync --quiet --recursive
 	export GIT_LFS_SKIP_SMUDGE=1; git submodule update --init --recursive
 	rm -rf $(NIMBLE_DIR)
