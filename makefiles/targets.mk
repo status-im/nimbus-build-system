@@ -60,7 +60,7 @@ build-nim: | sanity-checks
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY) update-common: | sanity-checks
-	[[ -e vendor/go/src/github.com/libp2p/go-libp2p-daemon ]] && \
+	- [[ -e vendor/go/src/github.com/libp2p/go-libp2p-daemon ]] && \
 		cd vendor/go/src/github.com/libp2p/go-libp2p-daemon && \
 		git reset --hard -q HEAD
 	git submodule sync --quiet --recursive
