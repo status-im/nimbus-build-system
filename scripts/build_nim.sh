@@ -11,8 +11,8 @@
 set -e
 
 # Git commits
-CSOURCES_COMMIT="b56e49bbedf62db22eb26388f98262e2948b2cbc" # 0.19.0
-NIMBLE_COMMIT="c8d79fc0228682677330a9f57d14389aaa641153" # Mar 26 10:06:06 2019
+CSOURCES_COMMIT="f72f471adb743bea4f8d8c59d19aa1cb885dcc59" # 0.20.0
+NIMBLE_COMMIT="d15c8530cb7480ce39ffa85a2dd9819d2d4fc645" # 0.10.2
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
@@ -40,12 +40,6 @@ else
 	ON_WINDOWS=0
 	EXE_SUFFIX=""
 fi
-# macOS
-if uname | grep -qi "darwin"; then
-	STAT_FORMAT="-f %m"
-else
-	STAT_FORMAT="-c %Y"
-fi
 
 NIM_BINARY="${NIM_DIR}/bin/nim${EXE_SUFFIX}"
 
@@ -61,8 +55,8 @@ nim_needs_rebuilding() {
 		cp -a "$CI_CACHE"/* "$NIM_DIR"/bin/ || true # let this one fail with an empty cache dir
 	fi
 
-	# compare binary mtime to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
-	if [[ -e "$NIM_BINARY" && $(stat $STAT_FORMAT "$NIM_BINARY") -gt $(cd "$NIM_DIR"; git log --pretty=format:%cd -n 1 --date=unix) ]]; then
+	# compare the built commit's timestamp to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
+	if [[ -e "${NIM_DIR}/bin/timestamp" && $(cat "${NIM_DIR}/bin/timestamp") -ge $(cd "$NIM_DIR"; git log --pretty=format:%cd -n 1 --date=unix) ]]; then
 		return $NO_REBUILD
 	else
 		return $REBUILD
@@ -125,6 +119,9 @@ build_nim() {
 	sed 's/koch tools/koch --stable tools/' build_all.sh > build_all_custom.sh
 	sh build_all_custom.sh
 	rm build_all_custom.sh
+
+	# record the last commit's timestamp
+	git log --pretty=format:%cd -n 1 --date=unix > bin/timestamp
 
 	# update the CI cache
 	popd # we were in $NIM_DIR
