@@ -56,7 +56,7 @@ nim_needs_rebuilding() {
 	fi
 
 	# compare the built commit's timestamp to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
-	if [[ -e "${NIM_DIR}/bin/timestamp" && $(cat "${NIM_DIR}/bin/timestamp") -ge $(cd "$NIM_DIR"; git log --pretty=format:%cd -n 1 --date=unix) ]]; then
+	if [[ -e "${NIM_DIR}/bin/timestamp" && $(cat "${NIM_DIR}/bin/timestamp") -ne $(cd "$NIM_DIR"; git log --pretty=format:%cd -n 1 --date=unix) ]]; then
 		return $NO_REBUILD
 	else
 		return $REBUILD
