@@ -98,7 +98,7 @@ $(NIMBLE_DIR): | $(NIM_BINARY)
 		git submodule foreach --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
 
 clean-common:
-	rm -rf build/{*.exe,*.so,*.so.0} vendor/go/bin $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/nimcache nimcache
+	rm -rf build/{*.exe,*.so,*.so.0} vendor/go/bin $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/timestamp $(NIM_DIR)/nimcache nimcache
 	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT) || true
 	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/libnatpmp clean $(HANDLE_OUTPUT) || true
 
