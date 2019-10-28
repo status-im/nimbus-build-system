@@ -12,7 +12,7 @@ set -e
 
 # Git commits
 CSOURCES_COMMIT="f72f471adb743bea4f8d8c59d19aa1cb885dcc59" # 0.20.0
-NIMBLE_COMMIT="d15c8530cb7480ce39ffa85a2dd9819d2d4fc645" # 0.10.2
+NIMBLE_COMMIT="4007b2a778429a978e12307bf13a038029b4c4d9" # 0.11.0
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
