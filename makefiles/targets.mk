@@ -65,6 +65,9 @@ $(NIM_BINARY) update-common: | sanity-checks
 		git reset --hard -q HEAD
 	git submodule sync --quiet --recursive
 	export GIT_LFS_SKIP_SMUDGE=1; git submodule update --init --recursive
+	# changing URLs in a submodule's submodule means we have to sync and update twice
+	git submodule sync --quiet --recursive
+	export GIT_LFS_SKIP_SMUDGE=1; git submodule update --init --recursive
 	rm -rf $(NIMBLE_DIR)
 	+ $(MAKE) build-nim
 
