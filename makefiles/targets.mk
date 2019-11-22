@@ -54,7 +54,7 @@ build-nim: | sanity-checks
 
 #- "go.mod" can be changed by the Go compiler, preventing a checkout
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
-#- initialises and updates the Git submodules, avoiding automated LFS downloads
+#- initialises and updates the Git submodules
 #- manages the AppVeyor cache of Nim compiler binaries
 #- deletes the ".nimble" dir to force the execution of the "deps" target
 #- allows parallel building with the '+' prefix
@@ -64,10 +64,10 @@ $(NIM_BINARY) update-common: | sanity-checks
 		cd vendor/go/src/github.com/libp2p/go-libp2p-daemon && \
 		git reset --hard -q HEAD
 	git submodule sync --quiet --recursive
-	export GIT_LFS_SKIP_SMUDGE=1; git submodule update --init --recursive
+	git submodule update --init --recursive
 	# changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
-	export GIT_LFS_SKIP_SMUDGE=1; git submodule update --init --recursive
+	git submodule update --init --recursive
 	rm -rf $(NIMBLE_DIR)
 	+ $(MAKE) build-nim
 
