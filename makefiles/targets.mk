@@ -63,8 +63,7 @@ $(NIM_BINARY) update-common: | sanity-checks
 	- [[ -e vendor/go/src/github.com/libp2p/go-libp2p-daemon ]] && \
 		cd vendor/go/src/github.com/libp2p/go-libp2p-daemon && \
 		git reset --hard -q HEAD
-	git submodule sync --quiet --recursive
-	git submodule update --init --recursive
+	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
 	git submodule update --init --recursive
