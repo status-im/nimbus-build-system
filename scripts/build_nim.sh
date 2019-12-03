@@ -116,7 +116,11 @@ build_nim() {
 	else
 		cp -a bin/nim bin/nim_csources
 	fi
-	sed 's/koch tools/koch --stable tools/' build_all.sh > build_all_custom.sh
+	sed \
+		-e 's/koch$/--warnings:off --hints:off koch/' \
+		-e 's/koch boot/koch boot --warnings:off --hints:off/' \
+		-e 's/koch tools/koch --stable tools --warnings:off --hints:off/' \
+		build_all.sh > build_all_custom.sh
 	sh build_all_custom.sh
 	rm build_all_custom.sh
 
