@@ -50,7 +50,7 @@ build-nim: | sanity-checks
 		CC=$(CC) \
 		MAKE=$(MAKE) \
 		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
-		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
+		bash "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
 
 #- "go.mod" can be changed by the Go compiler, preventing a checkout
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
@@ -97,7 +97,7 @@ endif
 $(NIMBLE_DIR): | $(NIM_BINARY)
 	mkdir -p $(NIMBLE_DIR)/pkgs
 	NIMBLE_DIR="$(CURDIR)/$(NIMBLE_DIR)" PWD_CMD="$(PWD)" \
-		git submodule foreach --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
+		git submodule foreach --quiet 'bash $(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
 
 clean-common:
 	rm -rf build/{*.exe,*.so,*.so.0} vendor/go/bin $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/timestamp $(NIM_DIR)/nimcache nimcache
