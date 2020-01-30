@@ -63,7 +63,7 @@ endif
 # we want a "recursively expanded" (delayed interpolation) variable here, so we can set CMD in rule recipes
 RUN_CMD_IN_ALL_REPOS = git submodule foreach --recursive --quiet 'echo -e "\n\e[32m$$name:\e[39m"; $(CMD)'; echo -e "\n\e[32m$$($(PWD)):\e[39m"; $(CMD)
 # absolute path, since it will be run at various subdirectory depths
-ENV_SCRIPT := bash "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/env.sh"
+ENV_SCRIPT := "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/env.sh"
 # duplicated in "env.sh" to prepend NIM_DIR/bin to PATH
 NIM_DIR := $(BUILD_SYSTEM_DIR)/vendor/Nim
 
