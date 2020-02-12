@@ -118,7 +118,7 @@ build_nim() {
 	fi
 	sed \
 		-e 's/koch$/--warnings:off --hints:off koch/' \
-		-e 's/koch boot/koch boot --listCmd -d:disableMarchNative/' \
+		-e 's/koch boot/koch boot --listCmd --skipUserCfg --skipParentCfg/' \
 		-e 's/koch tools/koch --stable tools --warnings:off --hints:off/' \
 		build_all.sh > build_all_custom.sh
 	sh build_all_custom.sh
