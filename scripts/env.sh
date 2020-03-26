@@ -20,10 +20,6 @@ export ABS_PATH="$(cd ${REL_PATH}; pwd)"
 
 export NIMBUS_ENV_DIR="${ABS_PATH}"
 
-# used by libp2p/go-libp2p-daemon
-export GOPATH="${ABS_PATH}/../../go"
-export GO111MODULE=on
-
 # looks like oh-my-zsh can't handle dots in PATH
 export NIM_PATH=$(cd "${ABS_PATH}/../vendor/Nim/bin"; pwd)
 
