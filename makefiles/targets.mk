@@ -21,9 +21,11 @@ sanity-checks:
 
 #- runs only the first time and after `make update`, so have "normal"
 #  (timestamp-checked) prerequisites here
-#- $(NIM_BINARY) is both a proxy for submodules having been initialised
-#  and a check for the actual compiler build
-deps-common: sanity-checks $(NIM_BINARY) $(NIMBLE_DIR) nat-libs
+deps-common: sanity-checks $(NIMBLE_DIR) nat-libs
+# - don't build our Nim target if it's not going to be used
+ifeq ($(USE_SYSTEM_NIM), 0)
+deps-common: $(NIM_BINARY)
+endif
 
 #- conditionally re-builds the Nim compiler (not usually needed, because `make update` calls this rule; delete $(NIM_BINARY) to force it)
 #- allows parallel building with the '+' prefix
@@ -48,12 +50,16 @@ build-nim: | sanity-checks
 #- deletes the ".nimble" dir to force the execution of the "deps" target
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
-$(NIM_BINARY) update-common: | sanity-checks
+update-common: | sanity-checks
 	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
 	git submodule update --init --recursive
 	rm -rf $(NIMBLE_DIR)
+	+ $(MAKE) build-nim
+
+#- rebuilds the Nim compiler if the corresponding submodule is updated
+$(NIM_BINARY): | sanity-checks
 	+ $(MAKE) build-nim
 
 # don't use this target, or you risk updating dependency repos that are not ready to be used in Nimbus
@@ -80,7 +86,7 @@ endif
 #- depends on Git submodules being initialised
 #- fakes a Nimble package repository with the minimum info needed by the Nim compiler
 #  for runtime path (i.e.: the second line in $(NIMBLE_DIR)/pkgs/*/*.nimble-link)
-$(NIMBLE_DIR): | $(NIM_BINARY)
+$(NIMBLE_DIR):
 	mkdir -p $(NIMBLE_DIR)/pkgs
 	NIMBLE_DIR="$(CURDIR)/$(NIMBLE_DIR)" PWD_CMD="$(PWD)" \
 		git submodule foreach --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
