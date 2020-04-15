@@ -56,7 +56,9 @@ update-common: | sanity-checks
 	git submodule sync --quiet --recursive
 	git submodule update --init --recursive
 	rm -rf $(NIMBLE_DIR)
+ifeq ($(USE_SYSTEM_NIM), 0)
 	+ $(MAKE) build-nim
+endif
 
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY): | sanity-checks
