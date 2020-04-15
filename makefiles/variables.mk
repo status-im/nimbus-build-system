@@ -82,3 +82,6 @@ endif
 # AppVeyor/Travis cache of $(NIM_DIR)/bin
 CI_CACHE :=
 
+# bypassing the shipped Nim, usually for testing new Nim devel versions
+USE_SYSTEM_NIM := 0
+

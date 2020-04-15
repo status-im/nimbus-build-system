@@ -26,9 +26,14 @@ export NIM_PATH=$(cd "${ABS_PATH}/../vendor/Nim/bin"; pwd)
 # Nimble needs this to be an absolute path
 export NIMBLE_DIR=$(cd "${ABS_PATH}/../../.nimble"; pwd)
 
+# we don't use Nimble-installed binaries, but just in case
+export PATH="${NIMBLE_DIR}/bin:${PATH}"
+
 #- make it an absolute path, so we can call this script from other dirs
 #- we can't use native Windows paths in here, because colons can't be escaped in PATH
-export PATH="${NIM_PATH}:${NIMBLE_DIR}/bin:${PATH}"
+if [[ "$USE_SYSTEM_NIM" != "1" ]]; then
+	export PATH="${NIM_PATH}:${PATH}"
+fi
 
 # used by nim-beacon-chain/tests/simulation/start.sh
 export BUILD_OUTPUTS_DIR="${ABS_PATH}/../../../build"

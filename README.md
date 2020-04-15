@@ -4,6 +4,12 @@
 
 GNU Make, Bash and the usual POSIX utilities.
 
+## Make flags
+
+* use the system Nim instead of the shipped version (usually for testing Nim devel versions)
+
+`make USE_SYSTEM_NIM=1 test`
+
 ## License
 
 Licensed and distributed under either of
