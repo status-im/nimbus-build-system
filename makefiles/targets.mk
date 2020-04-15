@@ -5,7 +5,7 @@
 # at your option. This file may not be copied, modified, or distributed except
 # according to those terms.
 
-.PHONY: deps-common sanity-checks go-checks nat-libs libminiupnpc.a libnatpmp.a clean-common mrproper github-ssh build-nim update-common update-remote status ntags ctags fetch-dlls
+.PHONY: deps-common sanity-checks nat-libs libminiupnpc.a libnatpmp.a clean-common mrproper github-ssh build-nim update-common update-remote status ntags ctags fetch-dlls
 
 #- when the special ".SILENT" target is present, all recipes are silenced as if they all had a "@" prefix
 #- by setting SILENT_TARGET_PREFIX to a non-empty value, the name of this target becomes meaningless to `make`
@@ -18,16 +18,6 @@ build:
 
 sanity-checks:
 	which $(CC) &>/dev/null || { echo "C compiler ($(CC)) not installed. Aborting."; exit 1; }
-
-MIN_GO_VER := 1.12
-DISABLE_GO_CHECKS := 0
-go-checks:
-ifeq ($(DISABLE_GO_CHECKS), 0)
-	which go &>/dev/null || { echo "Go compiler not installed. Aborting."; exit 1; }
-	GO_VER="$$(go version | sed -E 's/^.*go([0-9.]+).*$$/\1/')"; \
-	       [[ $$(echo -e "$${GO_VER}\n$(MIN_GO_VER)" | sort -t '.' -k 1,1 -k 2,2 -g | head -n 1) == "$(MIN_GO_VER)" ]] || \
-	       { echo "Minimum Go compiler version required: $(MIN_GO_VER). Version available: $$GO_VER. Aborting."; exit 1; }
-endif
 
 #- runs only the first time and after `make update`, so have "normal"
 #  (timestamp-checked) prerequisites here
@@ -52,7 +42,6 @@ build-nim: | sanity-checks
 		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
 		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
 
-#- "go.mod" can be changed by the Go compiler, preventing a checkout
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
 #- initialises and updates the Git submodules
 #- manages the AppVeyor cache of Nim compiler binaries
@@ -60,9 +49,6 @@ build-nim: | sanity-checks
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY) update-common: | sanity-checks
-	- [[ -e vendor/go/src/github.com/libp2p/go-libp2p-daemon ]] && \
-		cd vendor/go/src/github.com/libp2p/go-libp2p-daemon && \
-		git reset --hard -q HEAD
 	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
@@ -100,7 +86,7 @@ $(NIMBLE_DIR): | $(NIM_BINARY)
 		git submodule foreach --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
 
 clean-common:
-	rm -rf build/{*.exe,*.so,*.so.0} vendor/go/bin $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/timestamp $(NIM_DIR)/nimcache nimcache
+	rm -rf build/{*.exe,*.so,*.so.0} $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/timestamp $(NIM_DIR)/nimcache nimcache
 	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT) || true
 	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/libnatpmp clean $(HANDLE_OUTPUT) || true
 
