@@ -57,12 +57,12 @@ update-common: | sanity-checks
 	git submodule update --init --recursive
 	rm -rf $(NIMBLE_DIR)
 ifeq ($(USE_SYSTEM_NIM), 0)
-	+ $(MAKE) build-nim
+	+ $(MAKE) --no-print-directory build-nim
 endif
 
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY): | sanity-checks
-	+ $(MAKE) build-nim
+	+ $(MAKE) --no-print-directory build-nim
 
 # don't use this target, or you risk updating dependency repos that are not ready to be used in Nimbus
 update-remote:
