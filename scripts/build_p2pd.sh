@@ -54,7 +54,7 @@ target_needs_rebuilding() {
 	fi
 
 	# compare binary mtime to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
-	if [[ -e "$TARGET_BINARY" && $(stat $STAT_FORMAT "$TARGET_BINARY") -gt $(cd "$SUBREPO_DIR"; git log --pretty=format:%cd -n 1 --date=unix) ]]; then
+	if [[ -e "$TARGET_BINARY" && $(stat $STAT_FORMAT "$TARGET_BINARY") -gt $(cd "$SUBREPO_DIR"; git log --pretty=format:%cd -n 1 --date=format-local:%s) ]]; then
 		return $NO_REBUILD
 	else
 		return $REBUILD
