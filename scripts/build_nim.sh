@@ -36,9 +36,12 @@ UCPU=""
 if uname | grep -qiE "mingw|msys"; then
 	ON_WINDOWS=1
 	EXE_SUFFIX=".exe"
+	# otherwise it fails in AppVeyor due to https://github.com/git-for-windows/git/issues/2495
+	GIT_TIMESTAMP_ARG="--date=unix"
 else
 	ON_WINDOWS=0
 	EXE_SUFFIX=""
+	GIT_TIMESTAMP_ARG="--date=format-local:%s"
 fi
 
 NIM_BINARY="${NIM_DIR}/bin/nim${EXE_SUFFIX}"
@@ -56,7 +59,7 @@ nim_needs_rebuilding() {
 	fi
 
 	# compare the built commit's timestamp to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
-	if [[ -e "${NIM_DIR}/bin/timestamp" && $(cat "${NIM_DIR}/bin/timestamp") -eq $(cd "$NIM_DIR"; git log --pretty=format:%cd -n 1 --date=format-local:%s) ]]; then
+	if [[ -e "${NIM_DIR}/bin/timestamp" && $(cat "${NIM_DIR}/bin/timestamp") -eq $(cd "$NIM_DIR"; git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG}) ]]; then
 		return $NO_REBUILD
 	else
 		return $REBUILD
@@ -125,7 +128,7 @@ build_nim() {
 	rm build_all_custom.sh
 
 	# record the last commit's timestamp
-	git log --pretty=format:%cd -n 1 --date=format-local:%s > bin/timestamp
+	git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG} > bin/timestamp
 
 	# update the CI cache
 	popd # we were in $NIM_DIR

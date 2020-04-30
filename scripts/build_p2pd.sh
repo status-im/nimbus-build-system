@@ -30,8 +30,11 @@ fi
 # Windows detection
 if uname | grep -qiE "mingw|msys"; then
 	EXE_SUFFIX=".exe"
+	# otherwise it fails in AppVeyor due to https://github.com/git-for-windows/git/issues/2495
+	GIT_TIMESTAMP_ARG="--date=unix"
 else
 	EXE_SUFFIX=""
+	GIT_TIMESTAMP_ARG="--date=format-local:%s"
 fi
 
 # macOS
@@ -54,7 +57,7 @@ target_needs_rebuilding() {
 	fi
 
 	# compare binary mtime to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
-	if [[ -e "$TARGET_BINARY" && $(stat $STAT_FORMAT "$TARGET_BINARY") -gt $(cd "$SUBREPO_DIR"; git log --pretty=format:%cd -n 1 --date=format-local:%s) ]]; then
+	if [[ -e "$TARGET_BINARY" && $(stat $STAT_FORMAT "$TARGET_BINARY") -gt $(cd "$SUBREPO_DIR"; git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG}) ]]; then
 		return $NO_REBUILD
 	else
 		return $REBUILD
