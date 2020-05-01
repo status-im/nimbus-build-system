@@ -37,11 +37,11 @@ if uname | grep -qiE "mingw|msys"; then
 	ON_WINDOWS=1
 	EXE_SUFFIX=".exe"
 	# otherwise it fails in AppVeyor due to https://github.com/git-for-windows/git/issues/2495
-	GIT_TIMESTAMP_ARG="--date=unix"
+	GIT_TIMESTAMP_ARG="--date=unix" # available since Git 2.9.4
 else
 	ON_WINDOWS=0
 	EXE_SUFFIX=""
-	GIT_TIMESTAMP_ARG="--date=format-local:%s"
+	GIT_TIMESTAMP_ARG="--date=format-local:%s" # available since Git 2.7.0
 fi
 
 NIM_BINARY="${NIM_DIR}/bin/nim${EXE_SUFFIX}"
