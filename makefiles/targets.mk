@@ -52,7 +52,7 @@ build-nim: | sanity-checks
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 update-common: | sanity-checks
-	git submodule foreach --quiet 'git ls-files -k --exclude-standard | while read F; do rm -rf "$$F"; done'
+	git submodule foreach --quiet 'git ls-files --exclude-standard | while read F; do rm -rf "$$F"; done'
 	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
