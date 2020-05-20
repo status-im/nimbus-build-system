@@ -44,6 +44,7 @@ build-nim: | sanity-checks
 		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
 		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
 
+#- for each submodule, delete checked out files that prevent a fresh checkout
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
 #- initialises and updates the Git submodules
 #- manages the AppVeyor cache of Nim compiler binaries
@@ -51,6 +52,7 @@ build-nim: | sanity-checks
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 update-common: | sanity-checks
+	git submodule foreach --quiet 'git ls-files -k --exclude-standard | while read F; do rm -rf "$$F"; done'
 	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
