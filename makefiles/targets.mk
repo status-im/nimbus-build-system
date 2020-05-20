@@ -57,6 +57,7 @@ update-common: | sanity-checks
 	# changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
 	git submodule update --init --recursive
+	git submodule foreach --quiet 'git restore .'
 	rm -rf $(NIMBLE_DIR)
 	+ $(MAKE) --no-print-directory deps
 ifeq ($(USE_SYSTEM_NIM), 0)
