@@ -10,6 +10,12 @@ GNU Make, Bash and the usual POSIX utilities.
 
 `make USE_SYSTEM_NIM=1 test`
 
+## Make targets
+
+### show-deps
+
+Lists all Git submodule URLs, including nested ones.
+
 ## License
 
 Licensed and distributed under either of
