@@ -33,6 +33,8 @@ export PATH="${NIMBLE_DIR}/bin:${PATH}"
 #- we can't use native Windows paths in here, because colons can't be escaped in PATH
 if [[ "$USE_SYSTEM_NIM" != "1" ]]; then
 	export PATH="${NIM_PATH}:${PATH}"
+else
+	echo "[using system Nim: $(which nim)]"
 fi
 
 # used by nim-beacon-chain/tests/simulation/start.sh
