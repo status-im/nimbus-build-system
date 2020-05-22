@@ -14,7 +14,7 @@ $(SILENT_TARGET_PREFIX).SILENT:
 
 # dir
 build:
-	mkdir $@
+	mkdir -p $@
 
 sanity-checks:
 	which $(CC) &>/dev/null || { echo "C compiler ($(CC)) not installed. Aborting."; exit 1; }
