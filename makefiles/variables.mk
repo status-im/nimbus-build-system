@@ -28,7 +28,7 @@ endif
 # Chronicles log level
 LOG_LEVEL :=
 ifdef LOG_LEVEL
-  NIM_PARAMS := $(NIM_PARAMS) -d:chronicles_log_level=$(LOG_LEVEL)
+  NIM_PARAMS := $(NIM_PARAMS) -d:chronicles_log_level="$(LOG_LEVEL)"
 endif
 
 # avoid a "libpcre.so.3: cannot open shared object file: No such file or directory" message, where possible
