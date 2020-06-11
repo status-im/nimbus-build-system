@@ -42,7 +42,7 @@ example.
 See also the Makefiles we wrote for
 [Nimbus](https://github.com/status-im/nimbus/),
 [nim-beacon-chain](https://github.com/status-im/nim-beacon-chain),
-[Stratus](https://github.com/status-im/nim-stratus/blob/master/Makefile),
+[Stratus](https://github.com/status-im/nim-stratus),
 [nim-status-client](https://github.com/status-im/nim-status-client).
 
 Instruct your users to run `make update` after cloning your project, after a
