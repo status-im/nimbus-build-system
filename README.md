@@ -125,9 +125,107 @@ it comes to support.
 
 ## Make targets
 
+### build
+
+Internal target that creates the directory with the same name.
+
+### deps-common
+
+Internal target that needs to be a dependency for a custom "deps" target which,
+in turn, will be a dependency for various compilation targets.
+
+The superproject's Makefile would look like this:
+
+```make
+deps: | deps-common
+	# Have custom deps? Add them above.
+
+# building Nim programs
+foo bar: | build deps
+	echo -e $(BUILD_MSG) "build/$@" && \
+		$(ENV_SCRIPT) nim c -o:build/$@ $(NIM_PARAMS) "$@.nim"
+```
+
+The user should never have to run `make deps` directly.
+
+### build-nim
+
+Internal target that builds the Nim compiler if it's not built yet or if the
+corresponding submodule points to a newer commit than the existing binary.
+
+It's being executed as part of "update-common" and "$(NIM\_BINARY)" targets. It
+may be executed directly, rarely, when testing new Nim versions.
+
+### update-common
+
+Internal target that needs to become the dependency of a custom "update" target.
+
+```make
+update: | update-common
+	# Do you need to do something extra for this target?
+```
+
+Initialises and updates all Git submodules, with various ugly hacks to account
+for corner cases like submodules changing URLs or being replaced with regularly
+committed files.
+
+Tell your users to run `make update` after cloning the superproject, after a
+`git pull` and after changing branches or checking out older commits.
+
+### update-remote
+
+Dangerous target that updates all submodules to their latest remote commit.
+
+As you may imagine, it's usually necessary to roll back one or two of these
+automatic bumps. You do it like this:
+
+```bash
+git submodule update --recursive vendor/news
+```
+
+### clean-common
+
+Internal target that needs to be a dependency for a custom "clean" target that
+deletes any additional build artefacts:
+
+```make
+clean: | clean-common
+	rm -rf build/{foo,bar}
+```
+
+Don't run `make clean` if you don't really need to, since it also deletes the Nim compiler.
+
+Unlike C/C++ projects, we always recompile our Nim targets (because it's too
+hard to tell Make what are all the files involved in the build process), so
+there's no need to delete them to force a recompilation.
+
+### mrproper
+
+Dangerous target that, in addition to depending on "clean", deletes the
+"vendor" directory and any not-yet-pushed modification you may have in there.
+Don't use it.
+
+### github-ssh
+
+Changes submodule URLs, without affecting .gitmodules, so you connect to GitHub
+using your SSH key - very useful when you have write access to some submodule
+repos and you want to work on them without cloning them separately.
+
+### status
+
+Run `git status` in all your submodules and in your superproject.
+
+### ctags
+
+Run [Universal Ctags](https://github.com/universal-ctags/ctags) with a bunch of Nim-specific options.
+
 ### show-deps
 
-Lists all Git submodule URLs, including nested ones.
+List all Git submodules, including the nested ones.
+
+### fetch-dlls
+
+Windows-specific target. Downloads and unpacks in the "build" dir some DLLs we may not want to build ourselves (PCRE, RocksDB, libcurl, pdcurses, Snappy, SQLite3, SSLeay, etc.).
 
 ## License
 
