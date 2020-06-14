@@ -234,7 +234,7 @@ Windows-specific target. Downloads and unpacks in the "build" dir some DLLs we m
 Add a new Git submodule to your superproject, setting the branch to "master"
 and hiding submodule working tree changes in `git diff`.
 
-Usage: `./add_submodule.sh some/repo [destdir]` # 'destdir' defaults to 'vendor/repo'
+Usage: `./add_submodule.sh some/repo [destdir]` # "destdir" defaults to "vendor/repo"
 
 Examples:
 
