@@ -1,6 +1,6 @@
 # Common parts of the build system used by Nimbus and related projects
 
-We focus on building Nim software on multiple platforms without having to deal
+We focus on building Nim software on multiple platforms, without having to deal
 with language-specific package managers.
 
 We care about dependencies specified with commit-level accuracy (including the
@@ -31,7 +31,7 @@ Or you can do it by hand:
 git submodule add https://github.com/status-im/nimbus-build-system.git vendor/nimbus-build-system
 # specify a branch
 git config -f .gitmodules submodule.vendor/nimbus-build-system.branch master
-# hide submodule work tree changes in `git diff`
+# hide submodule working tree changes in `git diff`
 git config -f .gitmodules submodule.vendor/nimbus-build-system.ignore dirty
 ```
 
@@ -48,7 +48,7 @@ See also the Makefiles we wrote for
 Instruct your users to run `make update` after cloning your project, after a
 `git pull` or after switching branches.
 
-## Make flags
+## Make variables
 
 ### V
 
@@ -225,7 +225,139 @@ List all Git submodules, including the nested ones.
 
 ### fetch-dlls
 
-Windows-specific target. Downloads and unpacks in the "build" dir some DLLs we may not want to build ourselves (PCRE, RocksDB, libcurl, pdcurses, Snappy, SQLite3, SSLeay, etc.).
+Windows-specific target. Downloads and unpacks in the "build" dir some DLLs we may not want to build ourselves (PCRE, RocksDB, libcurl, pdcurses, SQLite3, OpenSSL, zlib, etc.).
+
+## Scripts
+
+### add_submodule.sh
+
+Add a new Git submodule to your superproject, setting the branch to "master"
+and hiding submodule working tree changes in `git diff`.
+
+Usage: `./add_submodule.sh some/repo [destdir]` # 'destdir' defaults to 'vendor/repo'
+
+Examples:
+
+`./add_submodule.sh status-im/nimbus-build-system`
+
+`./vendor/nimbus-build-system/scripts/add_submodule.sh status-im/nim-nat-traversal`
+
+### build_nim.sh
+
+Build the Nim compiler and some associated tools, parallelising the
+bootstrap-from-C phase, with binary caching and conditional recompilation
+support (based on the timestamp of the latest commit in the Nim repo).
+
+Usage: `./build_nim.sh nim_dir csources_dir nimble_dir ci_cache_dir`
+
+This script is not usually used directly, but through the `update` target
+(which depends on `update-common` which runs `build-nim`).
+
+Our `build-nim` target uses it like this:
+
+```make
+build-nim: | sanity-checks
+	+ NIM_BUILD_MSG="$(BUILD_MSG) Nim compiler" \
+		V=$(V) \
+		CC=$(CC) \
+		MAKE=$(MAKE) \
+		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
+		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
+```
+
+Other Nim projects that don't use this build system use the script directly in their CI. From a ".travis.yml":
+
+```yaml
+install:
+  - curl -O -L -s -S https://raw.githubusercontent.com/status-im/nimbus-build-system/master/scripts/build_nim.sh
+  - env MAKE="make -j${NPROC}" bash build_nim.sh Nim csources dist/nimble NimBinaries
+  - export PATH="$PWD/Nim/bin:$PATH"
+```
+
+Or an ".appveyor.yml":
+
+```yaml
+install:
+  # [...]
+  - curl -O -L -s -S https://raw.githubusercontent.com/status-im/nimbus-build-system/master/scripts/build_nim.sh
+  - env MAKE="mingw32-make -j2" ARCH_OVERRIDE=%PLATFORM% bash build_nim.sh Nim csources dist/nimble NimBinaries
+  - SET PATH=%CD%\Nim\bin;%PATH%
+```
+
+Notice how the number of Make jobs is set through the "MAKE" env var.
+
+### build_p2pd.sh
+
+Builds the "p2pd" Go daemon. No longer used by a Make target, but needed by
+other projects that run it directly in their CI config files, like this:
+
+```yaml
+install:
+  # [...]
+  # install and build go-libp2p-daemon
+  - curl -O -L -s -S https://raw.githubusercontent.com/status-im/nimbus-build-system/master/scripts/build_p2pd.sh
+  - bash build_p2pd.sh p2pdCache v0.2.1
+```
+
+### build_rocksdb.sh
+
+Builds RocksDB. No longer used.
+
+Usage: `./build_rocksdb.sh ci_cache_dir`
+
+### create_nimble_link.sh
+
+Cheeky little script used to fake a Nimble package repository in the
+`$(NIMBLE_DIR)` target (a dependency of `deps-common` which is a dependency of
+`deps`):
+
+```make
+$(NIMBLE_DIR):
+	mkdir -p $(NIMBLE_DIR)/pkgs
+	NIMBLE_DIR="$(CURDIR)/$(NIMBLE_DIR)" PWD_CMD="$(PWD)" \
+		git submodule foreach --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
+```
+
+That's how the Nim compiler knows how to find all these Nim packages we have in
+our submodules: we set the "NIMBLE\_DIR" env var to the path of this fake
+Nimble package repo.
+
+### env.sh
+
+Script responsible for setting up environment variables and shell aliases
+necessary for using this build system. It's being sourced by a script with the
+same name in the superproject's top directory:
+
+```bash
+#!/bin/bash
+
+# We use ${BASH_SOURCE[0]} instead of $0 to allow sourcing this file
+# and we fall back to a Zsh-specific special var to also support Zsh.
+REL_PATH="$(dirname ${BASH_SOURCE[0]:-${(%):-%x}})"
+ABS_PATH="$(cd ${REL_PATH}; pwd)"
+source ${ABS_PATH}/vendor/nimbus-build-system/scripts/env.sh
+```
+
+Supported usage: `./env.sh nim --version`
+
+Unsupported usage: `source env.sh; nim --version`
+
+An interesting alias is `nimble` which calls the "nimble.sh" script which pretends to be Nimble:
+
+```bash
+cd vendor/nim-metrics
+../../env.sh nimble test
+```
+
+### nimble.sh
+
+Simple script that symlinks the first \*.nimble file it finds to \*.nims and
+runs it using `nim`. Easier to access using the `nimble` alias in "env.sh".
+
+Of very limited use, it can execute \*.nimble targets, as long as there are no
+"before install:" blocks that the real Nimble strips before doing the same thing we do.
+
+If you need the real Nimble, it's in "vendor/nimbus-build-system/vendor/Nim/bin/nimble".
 
 ## License
 

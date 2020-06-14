@@ -1,7 +1,7 @@
 #!/bin/bash
 # used in Travis CI scripts
 
-# Copyright (c) 2018-2019 Status Research & Development GmbH. Licensed under
+# Copyright (c) 2018-2020 Status Research & Development GmbH. Licensed under
 # either of:
 # - Apache License, version 2.0
 # - MIT license
@@ -13,7 +13,7 @@ set -e
 ROCKSDBVER="5.17.2"
 
 # script arguments
-[[ $# -ne 1 ]] && { echo "usage: $0 ci_cache_dir"; exit 1; }
+[[ $# -ne 1 ]] && { echo "Usage: $0 ci_cache_dir"; exit 1; }
 CI_CACHE="$1" # here we cache the installed files
 
 # env vars

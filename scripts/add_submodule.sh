@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2018-2019 Status Research & Development GmbH. Licensed under
+# Copyright (c) 2018-2020 Status Research & Development GmbH. Licensed under
 # either of:
 # - Apache License, version 2.0
 # - MIT license
@@ -8,7 +8,7 @@
 # according to those terms.
 
 [ -z "$1" -o `echo "$1" | tr '/' '\n' | wc -l` != 2 ] && \
-	{ echo "usage: `basename $0` some/repo [destdir] # 'destdir' defaults to 'vendor/repo'"; exit 1; }
+	{ echo "Usage: `basename $0` some/repo [destdir] # 'destdir' defaults to 'vendor/repo'"; exit 1; }
 REPO="$1"
 
 DEST="vendor/${REPO#*/}"

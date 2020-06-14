@@ -1,7 +1,7 @@
 #!/bin/bash
 # used in Travis CI and AppVeyor scripts
 
-# Copyright (c) 2018-2019 Status Research & Development GmbH. Licensed under
+# Copyright (c) 2018-2020 Status Research & Development GmbH. Licensed under
 # either of:
 # - Apache License, version 2.0
 # - MIT license
@@ -15,7 +15,7 @@ CSOURCES_COMMIT="f72f471adb743bea4f8d8c59d19aa1cb885dcc59" # 0.20.0
 NIMBLE_COMMIT="4007b2a778429a978e12307bf13a038029b4c4d9" # 0.11.0
 
 # script arguments
-[[ $# -ne 4 ]] && { echo "usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
+[[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
 NIM_DIR="$1"
 CSOURCES_DIR="$2" # can be relative to NIM_DIR
 NIMBLE_DIR="$3" # can be relative to NIM_DIR
