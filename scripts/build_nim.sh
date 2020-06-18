@@ -51,7 +51,7 @@ nim_needs_rebuilding() {
 	NO_REBUILD=1
 
 	if [[ ! -e "$NIM_DIR" ]]; then
-		git clone --depth=1 https://github.com/status-im/Nim.git "$NIM_DIR"
+		git clone -q --depth=1 https://github.com/status-im/Nim.git "$NIM_DIR"
 	fi
 
 	if [[ -n "$CI_CACHE" && -d "$CI_CACHE" ]]; then
