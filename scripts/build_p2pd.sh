@@ -16,9 +16,10 @@ SUBREPO_DIR="vendor/go/src/github.com/libp2p/go-libp2p-daemon"
 if [[ ! -e "$SUBREPO_DIR" ]]; then
 	# we're probably in nim-libp2p's CI
 	SUBREPO_DIR="go-libp2p-daemon"
-	git clone https://github.com/libp2p/go-libp2p-daemon
+	rm -rf "$SUBREPO_DIR"
+	git clone -q https://github.com/libp2p/go-libp2p-daemon
 	cd "$SUBREPO_DIR"
-	git checkout $LIBP2P_COMMIT
+	git checkout -q $LIBP2P_COMMIT
 	cd ..
 fi
 
@@ -31,20 +32,13 @@ fi
 if uname | grep -qiE "mingw|msys"; then
 	EXE_SUFFIX=".exe"
 	# otherwise it fails in AppVeyor due to https://github.com/git-for-windows/git/issues/2495
-	GIT_TIMESTAMP_ARG="--date=unix"
+	GIT_TIMESTAMP_ARG="--date=unix" # available since Git 2.9.4
 else
 	EXE_SUFFIX=""
-	GIT_TIMESTAMP_ARG="--date=format-local:%s"
+	GIT_TIMESTAMP_ARG="--date=format-local:%s" # available since Git 2.7.0
 fi
 
-# macOS
-if uname | grep -qi "darwin"; then
-	STAT_FORMAT="-f %m"
-else
-	STAT_FORMAT="-c %Y"
-fi
-
-TARGET_DIR="${GOPATH}/bin"
+TARGET_DIR="${GOPATH%:*}/bin" # if multiple paths are specified, use the first one
 TARGET_BINARY="${TARGET_DIR}/p2pd${EXE_SUFFIX}"
 
 target_needs_rebuilding() {
@@ -56,8 +50,8 @@ target_needs_rebuilding() {
 		cp -a "$CACHE_DIR"/* "${TARGET_DIR}/"
 	fi
 
-	# compare binary mtime to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
-	if [[ -e "$TARGET_BINARY" && $(stat $STAT_FORMAT "$TARGET_BINARY") -gt $(cd "$SUBREPO_DIR"; git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG}) ]]; then
+	# compare the built commit's timestamp to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
+	if [[ -e "${TARGET_DIR}/timestamp" && $(cat "${TARGET_DIR}/timestamp") -eq $(cd "$SUBREPO_DIR"; git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG}) ]]; then
 		return $NO_REBUILD
 	else
 		return $REBUILD
@@ -83,6 +77,10 @@ build_target() {
 		exit 1
 	fi
 	go install ./...
+
+	# record the last commit's timestamp
+	git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG} > "${TARGET_DIR}/timestamp"
+
 	popd
 
 	# update the CI cache
@@ -95,5 +93,7 @@ build_target() {
 
 if target_needs_rebuilding; then
 	build_target
+else
+	echo "No rebuild needed."
 fi
 
