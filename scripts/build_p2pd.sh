@@ -26,7 +26,7 @@ fi
 ## env vars
 # verbosity level
 [[ -z "$V" ]] && V=0
-[[ -z "$BUILD_MSG" ]] && BUILD_MSG="Building p2pd"
+[[ -z "$BUILD_MSG" ]] && BUILD_MSG="Building p2pd ${LIBP2P_COMMIT}"
 
 # Windows detection
 if uname | grep -qiE "mingw|msys"; then
