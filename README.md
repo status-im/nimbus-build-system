@@ -227,6 +227,10 @@ List all Git submodules, including the nested ones.
 
 Windows-specific target. Downloads and unpacks in the "build" dir some DLLs we may not want to build ourselves (PCRE, RocksDB, libcurl, pdcurses, SQLite3, OpenSSL, zlib, etc.).
 
+### nat-libs
+
+Build "libminiupnpc.a" and "libnatpmp.a" from [nim-nat-traversal](https://github.com/status-im/nim-nat-traversal)'s submodules - not included in this repo.
+
 ## Scripts
 
 ### add_submodule.sh

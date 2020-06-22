@@ -21,7 +21,7 @@ sanity-checks:
 
 #- runs only the first time and after `make update`, so have "normal"
 #  (timestamp-checked) prerequisites here
-deps-common: sanity-checks $(NIMBLE_DIR) nat-libs
+deps-common: sanity-checks $(NIMBLE_DIR)
 # - don't build our Nim target if it's not going to be used
 ifeq ($(USE_SYSTEM_NIM), 0)
 deps-common: $(NIM_BINARY)
