@@ -1,11 +1,27 @@
-# Copyright (c) 2018-2019 Status Research & Development GmbH. Licensed under
+# Copyright (c) 2018-2020 Status Research & Development GmbH. Licensed under
 # either of:
 # - Apache License, version 2.0
 # - MIT license
 # at your option. This file may not be copied, modified, or distributed except
 # according to those terms.
 
-.PHONY: deps-common sanity-checks nat-libs libminiupnpc.a libnatpmp.a clean-common mrproper github-ssh build-nim update-common update-remote status ntags ctags fetch-dlls
+.PHONY: \
+	sanity-checks \
+	deps-common \
+	build-nim \
+	update-common \
+	update-remote \
+	nat-libs \
+	libminiupnpc.a \
+	libnatpmp.a \
+	clean-common \
+	mrproper \
+	github-ssh \
+	status \
+	ntags \
+	ctags \
+	show-deps \
+	fetch-dlls
 
 #- when the special ".SILENT" target is present, all recipes are silenced as if they all had a "@" prefix
 #- by setting SILENT_TARGET_PREFIX to a non-empty value, the name of this target becomes meaningless to `make`
