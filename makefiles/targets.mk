@@ -162,11 +162,11 @@ ctags:
 	--exclude=$(REPOS_DIR)/nim-bncurve/tests/tvectors.nim \
 	.
 
-# list all Git submodule URLs, including the nested ones
+# list all Git submodule URLs and commit hashes, including the nested ones
 show-deps:
-	{ git config --file .gitmodules --get-regexp url | cat ;\
-		git submodule foreach --quiet --recursive '[[ -f .gitmodules ]] && git config --file .gitmodules --get-regexp url | cat || true'; } \
-		| cut -d ' ' -f 2 | sort -u
+	{ "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/git_show_deps.sh" ;\
+		git submodule foreach --quiet --recursive "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/git_show_deps.sh"; } \
+		| sort -u
 
 ############################
 # Windows-specific section #
