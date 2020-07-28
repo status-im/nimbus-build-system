@@ -354,6 +354,13 @@ cd vendor/nim-metrics
 ../../env.sh nimble test
 ```
 
+In order to get autocompletion and code navigation functionality working
+properly in your text editor, you need the environment variables set by this script:
+
+```bash
+./env.sh vim
+```
+
 ### nimble.sh
 
 Simple script that symlinks the first \*.nimble file it finds to \*.nims and
