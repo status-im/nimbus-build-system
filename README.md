@@ -334,7 +334,7 @@ necessary for using this build system. It's being sourced by a script with the
 same name in the superproject's top directory:
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 
 # We use ${BASH_SOURCE[0]} instead of $0 to allow sourcing this file
 # and we fall back to a Zsh-specific special var to also support Zsh.
