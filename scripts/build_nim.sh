@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # used in Travis CI and AppVeyor scripts
 
 # Copyright (c) 2018-2020 Status Research & Development GmbH. Licensed under
