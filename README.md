@@ -124,6 +124,12 @@ it comes to support.
 
 `make USE_SYSTEM_NIM=1 test`
 
+### LINK_PCRE
+
+Link PCRE, defaults to 1.
+
+`make LINK_PCRE=0`
+
 ## Make targets
 
 ### build

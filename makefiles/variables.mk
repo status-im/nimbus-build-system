@@ -32,9 +32,12 @@ ifdef LOG_LEVEL
 endif
 
 # avoid a "libpcre.so.3: cannot open shared object file: No such file or directory" message, where possible
-ifneq ($(OS), Windows_NT)
-  ifneq ($(strip $(shell uname)), Darwin)
-    NIM_PARAMS := $(NIM_PARAMS) -d:usePcreHeader --passL:\"-lpcre\"
+LINK_PCRE := 1
+ifeq ($(LINK_PCRE), 1)
+  ifneq ($(OS), Windows_NT)
+	ifneq ($(strip $(shell uname)), Darwin)
+	  NIM_PARAMS := $(NIM_PARAMS) -d:usePcreHeader --passL:\"-lpcre\"
+	endif
   endif
 endif
 
