@@ -26,7 +26,6 @@ ifeq ($(V), 0)
 endif
 
 # Chronicles log level
-LOG_LEVEL :=
 ifdef LOG_LEVEL
   NIM_PARAMS := $(NIM_PARAMS) -d:chronicles_log_level="$(LOG_LEVEL)"
 endif
