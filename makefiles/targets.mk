@@ -111,7 +111,7 @@ endif
 $(NIMBLE_DIR):
 	mkdir -p $(NIMBLE_DIR)/pkgs
 	NIMBLE_DIR="$(CURDIR)/$(NIMBLE_DIR)" PWD_CMD="$(PWD)" \
-		git submodule foreach --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
+		git submodule foreach --recursive --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
 
 clean-common:
 	rm -rf build/{*.exe,*.so,*.so.0} $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/timestamp $(NIM_DIR)/nimcache nimcache
