@@ -56,7 +56,7 @@ build-nim: | sanity-checks
 	+ NIM_BUILD_MSG="$(BUILD_MSG) Nim compiler" \
 		V=$(V) \
 		CC=$(CC) \
-		MAKE=$(MAKE) \
+		MAKE="$(MAKE)" \
 		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
 		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
 
@@ -75,14 +75,14 @@ update-common: | sanity-checks
 	git submodule update --init --recursive
 	git submodule foreach --quiet --recursive 'git reset --quiet --hard'
 	rm -rf $(NIMBLE_DIR)
-	+ $(MAKE) --no-print-directory deps
+	+ "$(MAKE)" --no-print-directory deps
 ifeq ($(USE_SYSTEM_NIM), 0)
-	+ $(MAKE) --no-print-directory build-nim
+	+ "$(MAKE)" --no-print-directory build-nim
 endif
 
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY): | sanity-checks
-	+ $(MAKE) --no-print-directory build-nim
+	+ "$(MAKE)" --no-print-directory build-nim
 
 # don't use this target, or you risk updating dependency repos that are not ready to be used in Nimbus
 update-remote:
@@ -93,16 +93,16 @@ nat-libs: | libminiupnpc.a libnatpmp.a
 libminiupnpc.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
 	+ [ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc/$@ ] || \
-		$(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=gcc init $@ $(HANDLE_OUTPUT)
+		"$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=gcc init $@ $(HANDLE_OUTPUT)
 else
-	+ $(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc $@ $(HANDLE_OUTPUT)
 endif
 
 libnatpmp.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
-	+ $(MAKE) -C vendor/nim-nat-traversal/vendor/libnatpmp CC=gcc CFLAGS="-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4" $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp CC=gcc CFLAGS="-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4" $@ $(HANDLE_OUTPUT)
 else
-	+ $(MAKE) CFLAGS="-Wall -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4" -C vendor/nim-nat-traversal/vendor/libnatpmp $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" CFLAGS="-Wall -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4" -C vendor/nim-nat-traversal/vendor/libnatpmp $@ $(HANDLE_OUTPUT)
 endif
 
 #- depends on Git submodules being initialised
@@ -115,8 +115,8 @@ $(NIMBLE_DIR):
 
 clean-common:
 	rm -rf build/{*.exe,*.so,*.so.0} $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/timestamp $(NIM_DIR)/nimcache nimcache
-	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT) || true
-	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp ]] && $(MAKE) -C vendor/nim-nat-traversal/vendor/libnatpmp clean $(HANDLE_OUTPUT) || true
+	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT) || true
+	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp clean $(HANDLE_OUTPUT) || true
 
 # dangerous cleaning, because you may have not-yet-pushed branches and commits in those vendor repos you're about to delete
 mrproper: clean
