@@ -105,8 +105,8 @@ build_nim() {
 	rm -rf bin/nim_csources
 	pushd csources
 	if [[ "$ON_WINDOWS" == "0" ]]; then
-		$MAKE clean
-		$MAKE LD=$CC
+		$MAKE $UCPU clean
+		$MAKE $UCPU LD=$CC
 	else
 		$MAKE myos=windows $UCPU clean
 		$MAKE myos=windows $UCPU CC=gcc LD=gcc
@@ -142,4 +142,3 @@ build_nim() {
 if nim_needs_rebuilding; then
 	build_nim
 fi
-
