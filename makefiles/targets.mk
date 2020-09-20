@@ -64,6 +64,7 @@ build-nim: | sanity-checks
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
 #- initialises and updates the Git submodules
 #- hard-resets the working copies of submodules
+#- deletes "nimcache" directories
 #- deletes the ".nimble" dir and executes the "deps" target
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
@@ -74,6 +75,7 @@ update-common: | sanity-checks
 	git submodule sync --quiet --recursive
 	git submodule update --init --recursive
 	git submodule foreach --quiet --recursive 'git reset --quiet --hard'
+	find . -type d -name nimcache -print0 | xargs -0 rm -rf
 	rm -rf $(NIMBLE_DIR)
 	+ "$(MAKE)" --no-print-directory deps
 ifeq ($(USE_SYSTEM_NIM), 0)
