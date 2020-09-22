@@ -27,7 +27,7 @@ CI_CACHE="$4"
 [[ -z "$CC" ]] && CC="gcc"
 # to build csources in parallel, set MAKE="make -jN"
 [[ -z "$MAKE" ]] && MAKE="make"
-# for 32-bit binaries on a 64-bit Windows host
+# for 32-bit binaries on a 64-bit host
 UCPU=""
 [[ "$ARCH_OVERRIDE" == "x86" ]] && UCPU="ucpu=i686"
 [[ -z "$NIM_BUILD_MSG" ]] && NIM_BUILD_MSG="Building the Nim compiler"

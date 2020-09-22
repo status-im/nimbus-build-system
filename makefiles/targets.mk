@@ -102,9 +102,9 @@ endif
 
 libnatpmp.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
-	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp CC=gcc CFLAGS="-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4" $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp CC=gcc CFLAGS="-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" $@ $(HANDLE_OUTPUT)
 else
-	+ "$(MAKE)" CFLAGS="-Wall -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4" -C vendor/nim-nat-traversal/vendor/libnatpmp $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" CFLAGS="-Wall -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" -C vendor/nim-nat-traversal/vendor/libnatpmp $@ $(HANDLE_OUTPUT)
 endif
 
 #- depends on Git submodules being initialised
