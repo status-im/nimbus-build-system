@@ -190,6 +190,12 @@ automatic bumps. You do it like this:
 git submodule update --recursive vendor/news
 ```
 
+### clean-cross
+
+Confusingly named target that deletes libnatpmp and miniupnp objects and static
+libraries. Useful when you're cross-compiling and don't want to `make clean`
+and have to rebuild the compiler.
+
 ### clean-common
 
 Internal target that needs to be a dependency for a custom "clean" target that
