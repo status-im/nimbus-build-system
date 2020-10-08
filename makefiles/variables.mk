@@ -30,13 +30,23 @@ ifdef LOG_LEVEL
   NIM_PARAMS := $(NIM_PARAMS) -d:chronicles_log_level="$(LOG_LEVEL)"
 endif
 
+# statically link everything but libc
+PARTIAL_STATIC_LINKING := 0
+ifeq ($(PARTIAL_STATIC_LINKING), 1)
+  NIM_PARAMS := $(NIM_PARAMS) --passL:-static-libgcc
+endif
+
 # avoid a "libpcre.so.3: cannot open shared object file: No such file or directory" message, where possible
 LINK_PCRE := 1
 ifeq ($(LINK_PCRE), 1)
   ifneq ($(OS), Windows_NT)
-	ifneq ($(strip $(shell uname)), Darwin)
-	  NIM_PARAMS := $(NIM_PARAMS) -d:usePcreHeader --passL:\"-lpcre\"
-	endif
+    ifneq ($(strip $(shell uname)), Darwin)
+      ifeq ($(PARTIAL_STATIC_LINKING), 1)
+        NIM_PARAMS := $(NIM_PARAMS) -d:usePcreHeader --passL:-l:libpcre.a
+      else
+        NIM_PARAMS := $(NIM_PARAMS) -d:usePcreHeader --passL:-lpcre
+endif
+    endif
   endif
 endif
 

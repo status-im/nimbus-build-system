@@ -124,6 +124,14 @@ it comes to support.
 
 `make USE_SYSTEM_NIM=1 test`
 
+### PARTIAL_STATIC_LINKING
+
+Statically link some libraries (currently libgcc\_s and libpcre). Defaults to 0.
+
+This is useful when you can't statically link Glibc because you use NSS functions.
+
+`make PARTIAL_STATIC_LINKING=1 beacon_node`
+
 ### LINK_PCRE
 
 Link PCRE, defaults to 1.
