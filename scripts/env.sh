@@ -34,7 +34,7 @@ export PATH="${NIMBLE_DIR}/bin:${PATH}"
 if [[ "$USE_SYSTEM_NIM" != "1" ]]; then
 	export PATH="${NIM_PATH}:${PATH}"
 else
-	echo "[using system Nim: $(which nim)]"
+	echo "[using system Nim: $(which nim)]" 1>&2
 fi
 
 # used by nim-beacon-chain/tests/simulation/start.sh
