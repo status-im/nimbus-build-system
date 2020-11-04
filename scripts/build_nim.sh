@@ -26,7 +26,8 @@ CI_CACHE="$4"
 [[ -z "$V" ]] && V=0
 [[ -z "$CC" ]] && CC="gcc"
 # to build csources in parallel, set MAKE="make -jN"
-[[ -z "$MAKE" ]] && MAKE="make"
+# the default is 3 processes which is better than 1 but still not too taxing
+[[ -z "$MAKE" ]] && MAKE="make -j3"
 # for 32-bit binaries on a 64-bit host
 UCPU=""
 [[ "$ARCH_OVERRIDE" == "x86" ]] && UCPU="ucpu=i686"
