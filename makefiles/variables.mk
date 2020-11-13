@@ -37,7 +37,7 @@ ifeq ($(PARTIAL_STATIC_LINKING), 1)
 endif
 
 # avoid a "libpcre.so.3: cannot open shared object file: No such file or directory" message, where possible
-LINK_PCRE := 1
+LINK_PCRE ?= 1
 ifeq ($(LINK_PCRE), 1)
   ifneq ($(OS), Windows_NT)
     ifneq ($(strip $(shell uname)), Darwin)
