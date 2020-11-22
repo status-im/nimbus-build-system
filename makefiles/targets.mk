@@ -52,7 +52,7 @@ endif
 #  but this is broken when using symlinks, so build csources separately (we get parallel compiling as a bonus)
 #- Windows is a special case, as usual
 #- macOS is also a special case, with its "ln" not supporting "-r"
-#- the AppVeyor 32-build is done on a 64-bit image, so we need to override the architecture detection with ARCH_OVERRIDE
+#- the AppVeyor 32-bit build is done on a 64-bit image, so we need to override the architecture detection with ARCH_OVERRIDE
 build-nim: | sanity-checks
 	+ NIM_BUILD_MSG="$(BUILD_MSG) Nim compiler" \
 		V=$(V) \
@@ -180,7 +180,7 @@ show-deps:
 ifeq ($(OS), Windows_NT)
   # no tabs allowed for indentation here
 
-  # the AppVeyor 32-build is done on a 64-bit image, so we need to override the architecture detection
+  # the AppVeyor 32-bit build is done on a 64-bit image, so we need to override the architecture detection
   ifeq ($(ARCH_OVERRIDE), x86)
     ARCH := x86
   else
