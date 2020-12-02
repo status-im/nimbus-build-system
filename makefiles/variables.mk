@@ -66,33 +66,46 @@ GIT_STATUS := git status
 #- duplicated in "env.sh" for the env var with the same name
 NIMBLE_DIR := vendor/.nimble
 REPOS_DIR := vendor
+
 ifeq ($(OS), Windows_NT)
   PWD := pwd -W
+  EXE_SUFFIX := .exe
+  # available since Git 2.9.4
+  GIT_TIMESTAMP_ARG := --date=unix
 else
   PWD := pwd
+  EXE_SUFFIX :=
+  # available since Git 2.7.0
+  GIT_TIMESTAMP_ARG := --date=format-local:%s
 endif
+
+ifeq ($(shell uname), Darwin)
+  # md5sum - macOS is a special case
+  MD5SUM := md5 -r
+  NPROC_CMD := sysctl -n hw.logicalcpu
+else
+  MD5SUM := md5sum
+  NPROC_CMD := nproc
+endif
+
+GET_CURRENT_COMMIT_TIMESTAMP := git log --pretty=format:%cd -n 1 $(GIT_TIMESTAMP_ARG)
+UPDATE_TIMESTAMP := .update.timestamp
+
 ifeq ($(BUILD_SYSTEM_DIR),)
   $(error You need to define BUILD_SYSTEM_DIR before including this file)
 endif
+
 # we want a "recursively expanded" (delayed interpolation) variable here, so we can set CMD in rule recipes
 RUN_CMD_IN_ALL_REPOS = git submodule foreach --recursive --quiet 'echo -e "\n\e[32m$$name:\e[39m"; $(CMD)'; echo -e "\n\e[32m$$($(PWD)):\e[39m"; $(CMD)
+
 # absolute path, since it will be run at various subdirectory depths
 ENV_SCRIPT := "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/env.sh"
+
 # duplicated in "env.sh" to prepend NIM_DIR/bin to PATH
 NIM_DIR := $(BUILD_SYSTEM_DIR)/vendor/Nim
 
-ifeq ($(OS), Windows_NT)
-  EXE_SUFFIX := .exe
-else
-  EXE_SUFFIX :=
-endif
 NIM_BINARY := $(NIM_DIR)/bin/nim$(EXE_SUFFIX)
-# md5sum - macOS is a special case
-ifeq ($(shell uname), Darwin)
-  MD5SUM := md5 -r
-else
-  MD5SUM := md5sum
-endif
+
 # AppVeyor/Travis cache of $(NIM_DIR)/bin
 CI_CACHE :=
 
