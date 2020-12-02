@@ -144,6 +144,18 @@ Link PCRE, defaults to 1.
 
 Internal target that creates the directory with the same name.
 
+### sanity-checks
+
+Internal target used to check that a C compiler is installed.
+
+### warn-update
+
+Internal target that checks if `make update` was executed for the current Git commit.
+
+### warn-jobs
+
+Internal target that checks if Make's parallelism was enabled by specifying the number of jobs.
+
 ### deps-common
 
 Internal target that needs to be a dependency for a custom "deps" target which,

@@ -7,6 +7,8 @@
 
 .PHONY: \
 	sanity-checks \
+	warn-update \
+	warn-jobs \
 	deps-common \
 	build-nim \
 	update-common \
@@ -36,9 +38,24 @@ build:
 sanity-checks:
 	which $(CC) &>/dev/null || { echo "C compiler ($(CC)) not installed. Aborting."; exit 1; }
 
-#- runs only the first time and after `make update`, so have "normal"
-#  (timestamp-checked) prerequisites here
-deps-common: sanity-checks $(NIMBLE_DIR)
+#- check if "make update" was executed
+warn-update:
+	if [[ -e $(UPDATE_TIMESTAMP) ]]; then \
+		if [[ $$(cat $(UPDATE_TIMESTAMP)) -ne $$($(GET_CURRENT_COMMIT_TIMESTAMP)) ]]; then \
+			echo -e "\n\"$$(basename "$(MAKE)") update\" was not executed for the current Git commit! The resulting build is unsupported.\n"; \
+		fi; \
+	fi
+
+#- check if we're enabling multiple jobs - https://stackoverflow.com/a/48865939
+warn-jobs:
+	+ if [[ ! "${MAKEFLAGS}" =~ --jobserver[^=]+= ]]; then \
+		NPROC=$$($(NPROC_CMD)); \
+		if [[ $${NPROC} -gt 1 ]]; then \
+			echo -e "\nTip of the day: this will probably build faster if you use \"$$(basename "$(MAKE)") -j$${NPROC} ...\".\n"; \
+		fi; \
+	fi
+
+deps-common: | sanity-checks warn-update warn-jobs $(NIMBLE_DIR)
 # - don't build our Nim target if it's not going to be used
 ifeq ($(USE_SYSTEM_NIM), 0)
 deps-common: $(NIM_BINARY)
@@ -66,6 +83,7 @@ build-nim: | sanity-checks
 #- initialises and updates the Git submodules
 #- hard-resets the working copies of submodules
 #- deletes "nimcache" directories
+#- updates ".update.timestamp"
 #- deletes the ".nimble" dir and executes the "deps" target
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
@@ -77,6 +95,7 @@ update-common: | sanity-checks
 	git submodule update --init --recursive
 	git submodule foreach --quiet --recursive 'git reset --quiet --hard'
 	find . -type d -name nimcache -print0 | xargs -0 rm -rf
+	$(GET_CURRENT_COMMIT_TIMESTAMP) > $(UPDATE_TIMESTAMP)
 	rm -rf $(NIMBLE_DIR)
 	+ "$(MAKE)" --no-print-directory deps
 ifeq ($(USE_SYSTEM_NIM), 0)
