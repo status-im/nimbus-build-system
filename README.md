@@ -40,8 +40,8 @@ Write your own top-level Makefile, taking our
 example.
 
 See also the Makefiles we wrote for
-[Nimbus](https://github.com/status-im/nimbus/),
-[nim-beacon-chain](https://github.com/status-im/nim-beacon-chain),
+[Nimbus-eth1](https://github.com/status-im/nimbus-eth1),
+[Nimbus-eth2](https://github.com/status-im/nimbus-eth2),
 [nim-waku](https://github.com/status-im/nim-waku),
 [Stratus](https://github.com/status-im/nim-stratus),
 [nim-status-client](https://github.com/status-im/nim-status-client).
