@@ -112,3 +112,6 @@ CI_CACHE :=
 # bypassing the shipped Nim, usually for testing new Nim devel versions
 USE_SYSTEM_NIM := 0
 
+# Skip multiple bootstrap iterations and tool building.
+QUICK_AND_DIRTY_COMPILER := 0
+

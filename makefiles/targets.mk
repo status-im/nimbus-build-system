@@ -76,6 +76,7 @@ build-nim: | sanity-checks
 		CC=$(CC) \
 		MAKE="$(MAKE)" \
 		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
+		QUICK_AND_DIRTY_COMPILER=$(QUICK_AND_DIRTY_COMPILER) \
 		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
 
 #- for each submodule, delete checked out files (that might prevent a fresh checkout); skip dotfiles
