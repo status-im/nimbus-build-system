@@ -31,6 +31,7 @@ CI_CACHE="$4"
 UCPU=""
 [[ "$ARCH_OVERRIDE" == "x86" ]] && UCPU="ucpu=i686"
 [[ -z "$NIM_BUILD_MSG" ]] && NIM_BUILD_MSG="Building the Nim compiler"
+[[ -z "$QUICK_AND_DIRTY_COMPILER" ]] && QUICK_AND_DIRTY_COMPILER=0
 
 # Windows detection
 if uname | grep -qiE "mingw|msys"; then
@@ -119,13 +120,36 @@ build_nim() {
 	else
 		cp -a bin/nim bin/nim_csources
 	fi
-	sed \
-		-e 's/koch$/--warnings:off --hints:off koch/' \
-		-e 's/koch boot/koch boot --warnings:off --hints:off/' \
-		-e 's/koch tools/koch --stable tools --warnings:off --hints:off/' \
-		build_all.sh > build_all_custom.sh
-	sh build_all_custom.sh
-	rm build_all_custom.sh
+	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" ]]; then
+		sed \
+			-e 's/koch$/--warnings:off --hints:off koch/' \
+			-e 's/koch boot/koch boot --warnings:off --hints:off/' \
+			-e 's/koch tools/koch --stable tools --warnings:off --hints:off/' \
+			build_all.sh > build_all_custom.sh
+		sh build_all_custom.sh
+		rm build_all_custom.sh
+	else
+		# Don't re-build it multiple times until we get identical
+		# binaries, like "build_all.sh" does. Don't build any tools
+		# either. This is all about build speed, not developer comfort.
+		bin/nim_csources \
+			c \
+			--compileOnly \
+			--nimcache:nimcache \
+			-d:release \
+			--skipUserCfg \
+			--skipParentCfg \
+			--warnings:off \
+			--hints:off \
+			compiler/nim.nim
+		bin/nim_csources \
+			jsonscript \
+			--nimcache:nimcache \
+			--skipUserCfg \
+			--skipParentCfg \
+			compiler/nim.nim
+		cp -a compiler/nim bin/nim
+	fi
 
 	# record the last commit's timestamp
 	git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG} > bin/timestamp

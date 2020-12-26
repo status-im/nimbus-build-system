@@ -138,6 +138,13 @@ Link PCRE, defaults to 1.
 
 `make LINK_PCRE=0`
 
+### QUICK_AND_DIRTY_COMPILER
+
+Skip multiple Nim compiler bootstrap iterations and tool building. Useful in
+CI. Defaults to 0.
+
+`make QUICK_AND_DIRTY_COMPILER=1 build-nim`
+
 ## Make targets
 
 ### build
