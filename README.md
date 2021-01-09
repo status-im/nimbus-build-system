@@ -145,6 +145,8 @@ CI. Defaults to 0.
 
 `make QUICK_AND_DIRTY_COMPILER=1 build-nim`
 
+__Don't use this!__ It produces [a buggy Nim-1.2.6 compiler](https://github.com/status-im/nimbus-eth2/pull/2220).
+
 ## Make targets
 
 ### build
