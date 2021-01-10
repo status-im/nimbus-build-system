@@ -140,12 +140,10 @@ Link PCRE, defaults to 1.
 
 ### QUICK_AND_DIRTY_COMPILER
 
-Skip multiple Nim compiler bootstrap iterations and tool building. Useful in
+Skip some Nim compiler bootstrap iterations and tool building. Useful in
 CI. Defaults to 0.
 
 `make QUICK_AND_DIRTY_COMPILER=1 build-nim`
-
-__Don't use this!__ It produces [a buggy Nim-1.2.6 compiler](https://github.com/status-im/nimbus-eth2/pull/2220).
 
 ## Make targets
 

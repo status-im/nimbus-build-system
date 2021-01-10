@@ -148,7 +148,26 @@ build_nim() {
 			--skipUserCfg \
 			--skipParentCfg \
 			compiler/nim.nim
+		cp -a compiler/nim bin/nim1
+		# If we stop here, we risk ending up with a buggy compiler: https://github.com/status-im/nimbus-eth2/pull/2220
+		bin/nim1 \
+			c \
+			--compileOnly \
+			--nimcache:nimcache \
+			-d:release \
+			--skipUserCfg \
+			--skipParentCfg \
+			--warnings:off \
+			--hints:off \
+			compiler/nim.nim
+		bin/nim1 \
+			jsonscript \
+			--nimcache:nimcache \
+			--skipUserCfg \
+			--skipParentCfg \
+			compiler/nim.nim
 		cp -a compiler/nim bin/nim
+		rm bin/nim1
 	fi
 
 	# record the last commit's timestamp
