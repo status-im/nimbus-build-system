@@ -15,6 +15,6 @@ DEST="vendor/${REPO#*/}"
 [ -n "$2" ] && DEST="$2"
 
 git submodule add --force https://github.com/${REPO}.git "$DEST"
-git config -f .gitmodules submodule.${DEST}.ignore dirty
+git config -f .gitmodules submodule.${DEST}.ignore untracked
 git config -f .gitmodules submodule.${DEST}.branch master
 
