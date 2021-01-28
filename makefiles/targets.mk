@@ -42,7 +42,7 @@ sanity-checks:
 warn-update:
 	if [[ -e $(UPDATE_TIMESTAMP) ]]; then \
 		if [[ $$(cat $(UPDATE_TIMESTAMP)) -ne $$($(GET_CURRENT_COMMIT_TIMESTAMP)) ]]; then \
-			echo -e "\n\"$$(basename "$(MAKE)") update\" was not executed for the current Git commit! The resulting build is unsupported.\n"; \
+			echo -e "\n\"$$(basename Warning: to ensure you are running Nimbus with a tested build, please always run "$(MAKE)") update\" after \"git pull\" (it looks like you've forgotten to do this). This also applies whenever you switch to a new branch or commit e.g. whenever you run \"git checkout\".\n"; \
 		fi; \
 	fi
 
