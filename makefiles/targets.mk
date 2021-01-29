@@ -42,7 +42,7 @@ sanity-checks:
 warn-update:
 	if [[ -e $(UPDATE_TIMESTAMP) ]]; then \
 		if [[ $$(cat $(UPDATE_TIMESTAMP)) -ne $$($(GET_CURRENT_COMMIT_TIMESTAMP)) ]]; then \
-			echo -e "\n\"$$(basename "$(MAKE)") update\" was not executed for the current Git commit! The resulting build is unsupported.\n"; \
+			echo -e "\nWarning: to ensure you are building in a supported repo state, please always run \"$$(basename "$(MAKE)") update\" after \"git pull\"\n(it looks like you've forgotten to do this).\nThis also applies whenever you switch to a new branch or commit, e.g.: whenever you run \"git checkout ...\".\n"; \
 		fi; \
 	fi
 
