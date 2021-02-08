@@ -11,8 +11,8 @@
 set -e
 
 # Git commits
-CSOURCES_COMMIT="f72f471adb743bea4f8d8c59d19aa1cb885dcc59" # 0.20.0
-NIMBLE_COMMIT="4007b2a778429a978e12307bf13a038029b4c4d9" # 0.11.0
+: ${CSOURCES_COMMIT:=f72f471adb743bea4f8d8c59d19aa1cb885dcc59} # 0.20.0
+: ${NIMBLE_COMMIT:=007b2a778429a978e12307bf13a038029b4c4d9} # 0.11.0
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
@@ -55,12 +55,16 @@ nim_needs_rebuilding() {
 		git clone -q --depth=1 https://github.com/status-im/Nim.git "$NIM_DIR"
 	fi
 
+	: ${NIM_COMMIT:="$(cd "$NIM_DIR" && git rev-parse HEAD)"}
+
 	if [[ -n "$CI_CACHE" && -d "$CI_CACHE" ]]; then
 		cp -a "$CI_CACHE"/* "$NIM_DIR"/bin/ || true # let this one fail with an empty cache dir
 	fi
 
-	# compare the built commit's timestamp to the date of the last commit (keep in mind that Git doesn't preserve file timestamps)
-	if [[ -e "${NIM_DIR}/bin/timestamp" && $(cat "${NIM_DIR}/bin/timestamp") -eq $(cd "$NIM_DIR"; git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG}) ]]; then
+	if [[ -e "${NIM_DIR}/bin/nim-${NIM_COMMIT}" ]]; then
+		cd "${NIM_DIR}"
+		git checkout $NIM_COMMIT
+		cp -lf "bin/nim-${NIM_COMMIT}" "bin/nim"
 		return $NO_REBUILD
 	else
 		return $REBUILD
@@ -73,6 +77,12 @@ build_nim() {
 
 	# working directory
 	pushd "$NIM_DIR"
+
+	: ${NIM_COMMIT:="$(git rev-parse HEAD)"}
+	if ! git checkout $NIM_COMMIT; then
+		git fetch --all
+		git checkout $NIM_COMMIT
+	fi
 
 	# Git repos for csources and Nimble
 	if [[ ! -d "$CSOURCES_DIR" ]]; then
@@ -174,8 +184,7 @@ build_nim() {
 		rm bin/nim1
 	fi
 
-	# record the last commit's timestamp
-	git log --pretty=format:%cd -n 1 ${GIT_TIMESTAMP_ARG} > bin/timestamp
+	cp -l bin/nim bin/nim-${NIM_COMMIT}
 
 	# update the CI cache
 	popd # we were in $NIM_DIR
