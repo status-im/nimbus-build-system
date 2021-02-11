@@ -149,7 +149,9 @@ build_nim() {
 			--skipParentCfg \
 			compiler/nim.nim
 		cp -a compiler/nim bin/nim1
-		# If we stop here, we risk ending up with a buggy compiler: https://github.com/status-im/nimbus-eth2/pull/2220
+		# If we stop here, we risk ending up with a buggy compiler:
+		# https://github.com/status-im/nimbus-eth2/pull/2220
+		# https://github.com/status-im/nimbus-eth2/issues/2310
 		bin/nim1 \
 			c \
 			--compileOnly \
