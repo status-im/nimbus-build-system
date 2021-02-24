@@ -12,6 +12,7 @@
 	deps-common \
 	build-nim \
 	update-common \
+	$(NIM_BINARY) \
 	update-remote \
 	nat-libs \
 	libminiupnpc.a \
@@ -98,10 +99,7 @@ update-common: | sanity-checks
 	find . -type d -name nimcache -print0 | xargs -0 rm -rf
 	$(GET_CURRENT_COMMIT_TIMESTAMP) > $(UPDATE_TIMESTAMP)
 	rm -rf $(NIMBLE_DIR)
-	+ "$(MAKE)" --no-print-directory deps
-ifeq ($(USE_SYSTEM_NIM), 0)
-	+ "$(MAKE)" --no-print-directory build-nim
-endif
+	+ "$(MAKE)" --no-print-directory deps-common
 
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY): | sanity-checks
