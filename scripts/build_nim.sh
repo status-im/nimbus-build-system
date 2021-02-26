@@ -127,6 +127,9 @@ build_nim() {
 			build_all.sh > build_all_custom.sh
 		sh build_all_custom.sh
 		rm build_all_custom.sh
+		# Nimble needs a CA cert
+		rm -f bin/cacert.pem
+		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
 	else
 		# Don't re-build it multiple times until we get identical
 		# binaries, like "build_all.sh" does. Don't build any tools
