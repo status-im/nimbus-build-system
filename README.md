@@ -145,6 +145,18 @@ CI. Defaults to 0.
 
 `make QUICK_AND_DIRTY_COMPILER=1 build-nim`
 
+### NIM_COMMIT
+
+Build and use a different Nim compiler version than the default one.
+
+Possible values: (partial) commit hashes, tags, branches and anything else recognised by `git checkout ...`.
+
+`make -j8 NIM_COMMIT="v1.2.6" build-nim`
+
+You also need to specify it when using this non-default Nim compiler version:
+
+`make -j8 NIM_COMMIT="v1.2.6" nimbus_beacon_node`
+
 ## Make targets
 
 ### build

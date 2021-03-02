@@ -139,7 +139,7 @@ clean-cross:
 	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp-upstream ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream clean $(HANDLE_OUTPUT) || true
 
 clean-common: clean-cross
-	rm -rf build/{*.exe,*.so,*.so.0} $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/timestamp $(NIM_DIR)/nimcache nimcache
+	rm -rf build/{*.exe,*.so,*.so.0} $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/{timestamp,last_built_commit,nim_commit_*} $(NIM_DIR)/nimcache nimcache
 
 # dangerous cleaning, because you may have not-yet-pushed branches and commits in those vendor repos you're about to delete
 mrproper: clean

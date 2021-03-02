@@ -13,6 +13,8 @@ set -e
 # Git commits
 : ${CSOURCES_COMMIT:=f72f471adb743bea4f8d8c59d19aa1cb885dcc59} # 0.20.0
 : ${NIMBLE_COMMIT:=007b2a778429a978e12307bf13a038029b4c4d9} # 0.11.0
+: ${NIM_COMMIT:=nimbus} # could be a (partial) commit hash, a tag, a branch name, etc.
+NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
@@ -52,19 +54,32 @@ nim_needs_rebuilding() {
 	NO_REBUILD=1
 
 	if [[ ! -e "$NIM_DIR" ]]; then
+		# Shallow clone, optimised for the default NIM_COMMIT value.
 		git clone -q --depth=1 https://github.com/status-im/Nim.git "$NIM_DIR"
 	fi
 
-	: ${NIM_COMMIT:="$(cd "$NIM_DIR" && git rev-parse HEAD)"}
+	pushd "${NIM_DIR}" >/dev/null
+	if ! git checkout -q ${NIM_COMMIT}; then
+		# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
+		git fetch --all
+		git checkout -q ${NIM_COMMIT}
+	fi
+	# We can't use "rev-parse" here, because it would return the tag object's
+	# hash instead of the commit hash, when NIM_COMMIT is a tag.
+	NIM_COMMIT_HASH="$(git rev-list -n 1 ${NIM_COMMIT})"
+	popd >/dev/null
 
 	if [[ -n "$CI_CACHE" && -d "$CI_CACHE" ]]; then
 		cp -a "$CI_CACHE"/* "$NIM_DIR"/bin/ || true # let this one fail with an empty cache dir
 	fi
 
-	if [[ -e "${NIM_DIR}/bin/nim-${NIM_COMMIT}" ]]; then
-		cd "${NIM_DIR}"
-		git checkout $NIM_COMMIT
-		cp -lf "bin/nim-${NIM_COMMIT}" "bin/nim"
+	# compare the last built commit to the one requested
+	if [[ -e "${NIM_DIR}/bin/last_built_commit" && "$(cat "${NIM_DIR}/bin/last_built_commit")" == "${NIM_COMMIT_HASH}" ]]; then
+		return $NO_REBUILD
+	elif [[ -e "${NIM_DIR}/bin/nim_commit_${NIM_COMMIT_HASH}" ]]; then
+		# we built the requested commit in the past, so we simply reuse it
+		rm -f "${NIM_DIR}/bin/nim"
+		ln -s "nim_commit_${NIM_COMMIT_HASH}" "${NIM_DIR}/bin/nim"
 		return $NO_REBUILD
 	else
 		return $REBUILD
@@ -77,12 +92,6 @@ build_nim() {
 
 	# working directory
 	pushd "$NIM_DIR"
-
-	: ${NIM_COMMIT:="$(git rev-parse HEAD)"}
-	if ! git checkout $NIM_COMMIT; then
-		git fetch --all
-		git checkout $NIM_COMMIT
-	fi
 
 	# Git repos for csources and Nimble
 	if [[ ! -d "$CSOURCES_DIR" ]]; then
@@ -124,6 +133,7 @@ build_nim() {
 	fi
 	popd
 	if [[ -e csources/bin ]]; then
+		rm -f bin/nim bin/nim_csources
 		cp -a csources/bin/nim bin/nim
 		cp -a csources/bin/nim bin/nim_csources
 		rm -rf csources/bin
@@ -180,11 +190,17 @@ build_nim() {
 			--skipUserCfg \
 			--skipParentCfg \
 			compiler/nim.nim
+		rm -f bin/nim
 		cp -a compiler/nim bin/nim
 		rm bin/nim1
 	fi
 
-	cp -l bin/nim bin/nim-${NIM_COMMIT}
+	# record the built commit
+	echo ${NIM_COMMIT_HASH} > bin/last_built_commit
+
+	# create the symlink
+	mv bin/nim bin/nim_commit_${NIM_COMMIT_HASH}
+	ln -s nim_commit_${NIM_COMMIT_HASH} bin/nim
 
 	# update the CI cache
 	popd # we were in $NIM_DIR
