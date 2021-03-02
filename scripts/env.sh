@@ -37,6 +37,10 @@ else
 	echo "[using system Nim: $(which nim)]" 1>&2
 fi
 
+if [[ -n "${NIM_COMMIT}" && "${NIM_COMMIT}" != "nimbus" ]]; then
+	echo "[using Nim version ${NIM_COMMIT}]" 1>&2
+fi
+
 # used by nim-beacon-chain/tests/simulation/start.sh
 export BUILD_OUTPUTS_DIR="${ABS_PATH}/../../../build"
 
