@@ -12,7 +12,7 @@ set -e
 
 # Git commits
 : ${CSOURCES_COMMIT:=f72f471adb743bea4f8d8c59d19aa1cb885dcc59} # 0.20.0
-: ${NIMBLE_COMMIT:=007b2a778429a978e12307bf13a038029b4c4d9} # 0.11.0
+: ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
 : ${NIM_COMMIT:=nimbus} # could be a (partial) commit hash, a tag, a branch name, etc.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
 
@@ -61,6 +61,8 @@ nim_needs_rebuilding() {
 	pushd "${NIM_DIR}" >/dev/null
 	if ! git checkout -q ${NIM_COMMIT}; then
 		# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
+		# (This includes upstream branches and tags that might be missing from our fork.)
+		git remote add upstream https://github.com/nim-lang/Nim
 		git fetch --all
 		git checkout -q ${NIM_COMMIT}
 	fi
