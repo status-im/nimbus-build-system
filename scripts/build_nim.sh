@@ -59,6 +59,7 @@ nim_needs_rebuilding() {
 	fi
 
 	pushd "${NIM_DIR}" >/dev/null
+	git restore .
 	if ! git checkout -q ${NIM_COMMIT}; then
 		# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 		# (This includes upstream branches and tags that might be missing from our fork.)
