@@ -81,8 +81,8 @@ nim_needs_rebuilding() {
 		return $NO_REBUILD
 	elif [[ -e "${NIM_DIR}/bin/nim_commit_${NIM_COMMIT_HASH}" ]]; then
 		# we built the requested commit in the past, so we simply reuse it
-		rm -f "${NIM_DIR}/bin/nim"
-		ln -s "nim_commit_${NIM_COMMIT_HASH}" "${NIM_DIR}/bin/nim"
+		rm -f "${NIM_DIR}/bin/nim${EXE_SUFFIX}"
+		ln -s "nim_commit_${NIM_COMMIT_HASH}" "${NIM_DIR}/bin/nim${EXE_SUFFIX}"
 		return $NO_REBUILD
 	else
 		return $REBUILD
@@ -203,7 +203,7 @@ build_nim() {
 
 	# create the symlink
 	mv bin/nim bin/nim_commit_${NIM_COMMIT_HASH}
-	ln -s nim_commit_${NIM_COMMIT_HASH} bin/nim
+	ln -s nim_commit_${NIM_COMMIT_HASH} bin/nim${EXE_SUFFIX}
 
 	# update the CI cache
 	popd # we were in $NIM_DIR
