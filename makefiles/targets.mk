@@ -114,14 +114,14 @@ nat-libs: | libminiupnpc.a libnatpmp.a
 libminiupnpc.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
 	+ [ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc/$@ ] || \
-		"$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=gcc $@ $(HANDLE_OUTPUT)
+		"$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=$(CC) $@ $(HANDLE_OUTPUT)
 else
 	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc $@ $(HANDLE_OUTPUT)
 endif
 
 libnatpmp.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
-	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream CC=gcc CFLAGS="-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream CC=$(CC) CFLAGS="-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" $@ $(HANDLE_OUTPUT)
 else
 	+ "$(MAKE)" CFLAGS="-Wall -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream $@ $(HANDLE_OUTPUT)
 endif
