@@ -125,7 +125,7 @@ build_nim() {
 	fi
 
 	# bootstrap the Nim compiler and build the tools
-	rm -rf bin/nim_csources
+	rm -f bin/{nim,nim_csources}
 	pushd csources
 	if [[ "$ON_WINDOWS" == "0" ]]; then
 		$MAKE $UCPU clean
