@@ -83,6 +83,7 @@ nim_needs_rebuilding() {
 		# we built the requested commit in the past, so we simply reuse it
 		rm -f "${NIM_DIR}/bin/nim${EXE_SUFFIX}"
 		ln -s "nim_commit_${NIM_COMMIT_HASH}" "${NIM_DIR}/bin/nim${EXE_SUFFIX}"
+		echo ${NIM_COMMIT_HASH} > "${NIM_DIR}/bin/last_built_commit"
 		return $NO_REBUILD
 	else
 		return $REBUILD
