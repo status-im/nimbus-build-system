@@ -11,7 +11,7 @@
 set -e
 
 # Git commits
-: ${CSOURCES_COMMIT:=f72f471adb743bea4f8d8c59d19aa1cb885dcc59} # 0.20.0
+: ${CSOURCES_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff} # 1.0.11 + support for Apple's M1
 : ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
 : ${NIM_COMMIT:=nimbus} # could be a (partial) commit hash, a tag, a branch name, etc.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
@@ -101,7 +101,7 @@ build_nim() {
 	if [[ ! -d "$CSOURCES_DIR" ]]; then
 		mkdir -p "$CSOURCES_DIR"
 		pushd "$CSOURCES_DIR"
-		git clone https://github.com/nim-lang/csources.git .
+		git clone https://github.com/nim-lang/csources_v1.git .
 		git checkout $CSOURCES_COMMIT
 		popd
 	fi
