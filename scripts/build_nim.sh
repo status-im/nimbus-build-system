@@ -59,7 +59,8 @@ nim_needs_rebuilding() {
 	fi
 
 	pushd "${NIM_DIR}" >/dev/null
-	git restore .
+	# support old Git versions, like the one from Ubuntu-18.04
+	git restore . 2>/dev/null || git reset --hard
 	if ! git checkout -q ${NIM_COMMIT}; then
 		# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 		# (This includes upstream branches and tags that might be missing from our fork.)
