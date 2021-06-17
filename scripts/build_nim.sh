@@ -149,6 +149,7 @@ build_nim() {
 		sed \
 			-e 's/koch$/--warnings:off --hints:off koch/' \
 			-e 's/koch boot/koch boot --warnings:off --hints:off/' \
+			-e '/nimBuildCsourcesIfNeeded/d' \
 			build_all.sh > build_all_custom.sh
 		sh build_all_custom.sh
 		rm build_all_custom.sh
