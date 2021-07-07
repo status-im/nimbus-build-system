@@ -68,6 +68,9 @@ nim_needs_rebuilding() {
 		git fetch --all
 		git checkout -q ${NIM_COMMIT}
 	fi
+	# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
+	git pull -q 2>/dev/null || true
+	git checkout -q ${NIM_COMMIT}
 	# We can't use "rev-parse" here, because it would return the tag object's
 	# hash instead of the commit hash, when NIM_COMMIT is a tag.
 	NIM_COMMIT_HASH="$(git rev-list -n 1 ${NIM_COMMIT})"
