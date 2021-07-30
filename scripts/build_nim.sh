@@ -68,6 +68,9 @@ nim_needs_rebuilding() {
 		git fetch --all
 		git checkout -q ${NIM_COMMIT}
 	fi
+	# In case the local branch diverged and a fast-forward merge is not possible.
+	git fetch || true
+	git reset -q --hard origin/${NIM_COMMIT} || true
 	# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
 	git pull -q 2>/dev/null || true
 	git checkout -q ${NIM_COMMIT}
