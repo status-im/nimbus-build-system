@@ -1,4 +1,4 @@
-# Copyright (c) 2018-2020 Status Research & Development GmbH. Licensed under
+# Copyright (c) 2018-2021 Status Research & Development GmbH. Licensed under
 # either of:
 # - Apache License, version 2.0
 # - MIT license
@@ -114,7 +114,7 @@ nat-libs: | libminiupnpc.a libnatpmp.a
 libminiupnpc.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
 	+ [ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc/$@ ] || \
-		"$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=$(CC) $@ $(HANDLE_OUTPUT)
+		PATH=".:${PATH}" "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=$(CC) $@ $(HANDLE_OUTPUT)
 else
 	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc $@ $(HANDLE_OUTPUT)
 endif
