@@ -34,6 +34,7 @@ UCPU=""
 [[ "$ARCH_OVERRIDE" == "x86" ]] && UCPU="ucpu=i686"
 [[ -z "$NIM_BUILD_MSG" ]] && NIM_BUILD_MSG="Building the Nim compiler"
 [[ -z "$QUICK_AND_DIRTY_COMPILER" ]] && QUICK_AND_DIRTY_COMPILER=0
+[[ -z "$QUICK_AND_DIRTY_NIMBLE" ]] && QUICK_AND_DIRTY_NIMBLE=0
 
 # Windows detection
 if uname | grep -qiE "mingw|msys"; then
@@ -205,6 +206,12 @@ build_nim() {
 		rm -f bin/nim
 		cp -a compiler/nim bin/nim
 		rm bin/nim1
+
+		# Do we want Nimble in this quick build?
+		if [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
+			bin/nim c -d:release --noNimblePath --skipUserCfg --skipParentCfg dist/nimble/src/nimble.nim
+			mv dist/nimble/src/nimble bin/
+		fi
 	fi
 
 	# record the built commit

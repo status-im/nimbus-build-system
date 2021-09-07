@@ -145,6 +145,13 @@ CI. Defaults to 0.
 
 `make QUICK_AND_DIRTY_COMPILER=1 build-nim`
 
+### QUICK_AND_DIRTY_NIMBLE
+
+Build Nimble when it wouldn't be normally built as part of the tools. Only
+useful with `QUICK_AND_DIRTY_COMPILER=1`. Defaults to 0.
+
+`make QUICK_AND_DIRTY_COMPILER=1 QUICK_AND_DIRTY_NIMBLE=1 build-nim`
+
 ### NIM_COMMIT
 
 Build and use a different Nim compiler version than the default one.
