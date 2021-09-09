@@ -56,7 +56,7 @@ EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
 
 # coloured messages
-BUILD_MSG := "\\e[92mBuilding:\\e[39m"
+BUILD_MSG := "\\x1B[92mBuilding:\\x1B[39m"
 
 GIT_CLONE := git clone --quiet --recurse-submodules
 GIT_PULL := git pull --recurse-submodules
@@ -96,7 +96,7 @@ ifeq ($(BUILD_SYSTEM_DIR),)
 endif
 
 # we want a "recursively expanded" (delayed interpolation) variable here, so we can set CMD in rule recipes
-RUN_CMD_IN_ALL_REPOS = git submodule foreach --recursive --quiet 'echo -e "\n\e[32m$$name:\e[39m"; $(CMD)'; echo -e "\n\e[32m$$($(PWD)):\e[39m"; $(CMD)
+RUN_CMD_IN_ALL_REPOS = git submodule foreach --recursive --quiet 'echo -e "\n\x1B[32m$$name:\x1B[39m"; $(CMD)'; echo -e "\n\x1B[32m$$($(PWD)):\x1B[39m"; $(CMD)
 
 # absolute path, since it will be run at various subdirectory depths
 ENV_SCRIPT := "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/env.sh"
