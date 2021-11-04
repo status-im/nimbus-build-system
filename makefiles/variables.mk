@@ -21,7 +21,8 @@ HANDLE_OUTPUT :=
 SILENT_TARGET_PREFIX := disabled
 ifeq ($(V), 0)
   NIM_PARAMS := $(NIM_PARAMS) --hints:off
-  HANDLE_OUTPUT := &>/dev/null
+  # don't swallow stderr, in case it's important
+  HANDLE_OUTPUT := >/dev/null
   SILENT_TARGET_PREFIX :=
 endif
 
