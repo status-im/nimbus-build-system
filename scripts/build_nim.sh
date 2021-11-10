@@ -13,7 +13,7 @@ set -e
 # Git commits
 : ${CSOURCES_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff} # 1.0.11 + support for Apple's M1
 : ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
-: ${NIM_COMMIT:=nimbus} # could be a (partial) commit hash, a tag, a branch name, etc.
+# NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
 
 # script arguments
@@ -60,24 +60,29 @@ nim_needs_rebuilding() {
 	fi
 
 	pushd "${NIM_DIR}" >/dev/null
-	# support old Git versions, like the one from Ubuntu-18.04
-	git restore . 2>/dev/null || git reset --hard
-	if ! git checkout -q ${NIM_COMMIT}; then
-		# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
-		# (This includes upstream branches and tags that might be missing from our fork.)
-		git remote add upstream https://github.com/nim-lang/Nim
-		git fetch --all
+	if [[ -n "${NIM_COMMIT}" ]]; then
+		# support old Git versions, like the one from Ubuntu-18.04
+		git restore . 2>/dev/null || git reset --hard
+		if ! git checkout -q ${NIM_COMMIT}; then
+			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
+			# (This includes upstream branches and tags that might be missing from our fork.)
+			git remote add upstream https://github.com/nim-lang/Nim
+			git fetch --all
+			git checkout -q ${NIM_COMMIT}
+		fi
+		# In case the local branch diverged and a fast-forward merge is not possible.
+		git fetch || true
+		git reset -q --hard origin/${NIM_COMMIT} || true
+		# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
+		git pull -q 2>/dev/null || true
 		git checkout -q ${NIM_COMMIT}
+		# We can't use "rev-parse" here, because it would return the tag object's
+		# hash instead of the commit hash, when NIM_COMMIT is a tag.
+		NIM_COMMIT_HASH="$(git rev-list -n 1 ${NIM_COMMIT})"
+	else
+		# NIM_COMMIT is empty, so assume the commit we need is already checked out
+		NIM_COMMIT_HASH="$(git rev-list -n 1 HEAD)"
 	fi
-	# In case the local branch diverged and a fast-forward merge is not possible.
-	git fetch || true
-	git reset -q --hard origin/${NIM_COMMIT} || true
-	# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
-	git pull -q 2>/dev/null || true
-	git checkout -q ${NIM_COMMIT}
-	# We can't use "rev-parse" here, because it would return the tag object's
-	# hash instead of the commit hash, when NIM_COMMIT is a tag.
-	NIM_COMMIT_HASH="$(git rev-list -n 1 ${NIM_COMMIT})"
 	popd >/dev/null
 
 	if [[ -n "$CI_CACHE" && -d "$CI_CACHE" ]]; then
