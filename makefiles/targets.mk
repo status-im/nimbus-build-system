@@ -65,6 +65,7 @@ endif
 
 #- conditionally re-builds the Nim compiler (not usually needed, because `make update` calls this rule; delete $(NIM_BINARY) to force it)
 #- allows parallel building with the '+' prefix
+#- handles the case where NIM_COMMIT was previously used to build a non-default compiler
 #- forces a rebuild of csources, Nimble and a complete compiler rebuild, in case we're called after pulling a new Nim version
 #- uses our Git submodules for csources and Nimble (Git doesn't let us place them in another submodule)
 #- build_all.sh looks at the parent dir to decide whether to copy the resulting csources binary there,
@@ -73,7 +74,8 @@ endif
 #- macOS is also a special case, with its "ln" not supporting "-r"
 #- the AppVeyor 32-bit build is done on a 64-bit image, so we need to override the architecture detection with ARCH_OVERRIDE
 build-nim: | sanity-checks
-	+ NIM_BUILD_MSG="$(BUILD_MSG) Nim compiler" \
+	+ if [[ -z "$(NIM_COMMIT)" ]]; then git submodule update --init --recursive "$(BUILD_SYSTEM_DIR)"; fi; \
+		NIM_BUILD_MSG="$(BUILD_MSG) Nim compiler" \
 		V=$(V) \
 		CC=$(CC) \
 		MAKE="$(MAKE)" \
