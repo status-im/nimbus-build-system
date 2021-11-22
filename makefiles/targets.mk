@@ -11,6 +11,7 @@
 	warn-jobs \
 	deps-common \
 	build-nim \
+	update-test \
 	update-common \
 	$(NIM_BINARY) \
 	update-remote \
@@ -80,6 +81,12 @@ build-nim: | sanity-checks
 		QUICK_AND_DIRTY_COMPILER=$(QUICK_AND_DIRTY_COMPILER) \
 		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources-v1 ../nimble "$(CI_CACHE)"
 
+# Check if the update might cause loss of work. Abort, if so, while allowing an override mechanism.
+update-test:
+	COMMAND="git status --short --untracked-files=no --ignore-submodules=untracked"; \
+	LINES=$$({ $${COMMAND} | grep . && echo ^---top level || true; git submodule foreach --recursive --quiet "$${COMMAND} | grep . && echo ^---\$$name || true"; } | tee /dev/tty | wc -l); \
+	if [[ "$${LINES}" -ne "0" && "$(OVERRIDE)" != "1" ]]; then echo -e "\nYou have uncommitted local changes which might be overwritten by the update. Aborting.\nIf you know better, you can re-run the command with OVERRIDE=1.\n"; exit 1; fi
+
 #- for each submodule, delete checked out files (that might prevent a fresh checkout); skip dotfiles
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
 #- initialises and updates the Git submodules
@@ -89,7 +96,7 @@ build-nim: | sanity-checks
 #- deletes the ".nimble" dir and executes the "deps" target
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
-update-common: | sanity-checks
+update-common: | sanity-checks update-test
 	git submodule foreach --quiet 'git ls-files --exclude-standard --recurse-submodules -z -- ":!:.*" | xargs -0 rm -rf'
 	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
