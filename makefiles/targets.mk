@@ -145,7 +145,7 @@ $(NIMBLE_DIR):
 
 clean-cross:
 	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT) || true
-	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp-upstream ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream clean $(HANDLE_OUTPUT) || true
+	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp-upstream ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream CC=$(CC) clean $(HANDLE_OUTPUT) || true
 
 clean-common: clean-cross
 	rm -rf build/{*.exe,*.so,*.so.0} $(NIMBLE_DIR) $(NIM_BINARY) $(NIM_DIR)/bin/{timestamp,last_built_commit,nim_commit_*} $(NIM_DIR)/nimcache nimcache
