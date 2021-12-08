@@ -63,7 +63,7 @@ nim_needs_rebuilding() {
 	if [[ -n "${NIM_COMMIT}" ]]; then
 		# support old Git versions, like the one from Ubuntu-18.04
 		git restore . 2>/dev/null || git reset --hard
-		if ! git checkout -q ${NIM_COMMIT}; then
+		if ! git checkout -q ${NIM_COMMIT} 2>/dev/null; then
 			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 			# (This includes upstream branches and tags that might be missing from our fork.)
 			git remote add upstream https://github.com/nim-lang/Nim
@@ -72,7 +72,7 @@ nim_needs_rebuilding() {
 		fi
 		# In case the local branch diverged and a fast-forward merge is not possible.
 		git fetch || true
-		git reset -q --hard origin/${NIM_COMMIT} || true
+		git reset -q --hard origin/${NIM_COMMIT} 2>/dev/null || true
 		# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
 		git pull -q 2>/dev/null || true
 		git checkout -q ${NIM_COMMIT}
