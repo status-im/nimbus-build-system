@@ -164,6 +164,33 @@ You also need to specify it when using this non-default Nim compiler version:
 
 `make -j8 NIM_COMMIT="v1.2.6" nimbus_beacon_node`
 
+### EXCLUDED_NIM_PACKAGES
+
+List of relative paths (incomplete ones also work) to Git submodules that
+should not end up as Nim packages in "vendor/.nimble" - usually because they
+duplicate more high-level ones.
+
+For example, say we have:
+
+```text
+$ find vendor -name "nim-chronos" | sort
+vendor/nim-chronos
+vendor/nim-waku/vendor/nim-chronos
+vendor/nim-waku/vendor/nim-dnsdisc/vendor/nim-chronos
+```
+
+We only want the top-level "vendor/nim-chronos", so we put the rest in
+`EXCLUDED_NIM_PACKAGES`, in the top-level Makefile:
+
+```text
+EXCLUDED_NIM_PACKAGES := vendor/nim-waku/vendor/nim-chronos \
+			 vendor/nim-waku/vendor/nimbus-build-system \
+			 vendor/nim-waku/vendor/nim-dnsdisc/vendor
+```
+
+As you see, we can exclude all those "nim-dnsdisc" submodules with a single
+line, because the pattern is not anchored during the match.
+
 ## Make targets
 
 ### build
