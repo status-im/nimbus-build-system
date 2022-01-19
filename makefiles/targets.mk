@@ -85,7 +85,7 @@ build-nim: | sanity-checks
 
 # Check if the update might cause loss of work. Abort, if so, while allowing an override mechanism.
 update-test:
-	TEE_TO_TTY="cat"; if [[ -e /dev/tty ]]; then TEE_TO_TTY="tee /dev/tty"; fi; \
+	TEE_TO_TTY="cat"; if bash -c ": >/dev/tty" &>/dev/null; then TEE_TO_TTY="tee /dev/tty"; fi; \
 	COMMAND="git status --short --untracked-files=no --ignore-submodules=untracked"; \
 	LINES=$$({ $${COMMAND} | grep 'vendor' && echo ^---top level || true; git submodule foreach --recursive --quiet "$${COMMAND} | grep . && echo ^---\$$name || true"; } | $${TEE_TO_TTY} | wc -l); \
 	if [[ "$${LINES}" -ne "0" && "$(OVERRIDE)" != "1" ]]; then echo -e "\nYou have uncommitted local changes which might be overwritten by the update. Aborting.\nIf you know better, you can re-run the command with OVERRIDE=1.\n"; exit 1; fi
