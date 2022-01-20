@@ -376,19 +376,6 @@ install:
 
 Notice how the number of Make jobs is set through the "MAKE" env var.
 
-### build_p2pd.sh
-
-Builds the "p2pd" Go daemon. No longer used by a Make target, but needed by
-other projects that run it directly in their CI config files, like this:
-
-```yaml
-install:
-  # [...]
-  # install and build go-libp2p-daemon
-  - curl -O -L -s -S https://raw.githubusercontent.com/status-im/nimbus-build-system/master/scripts/build_p2pd.sh
-  - bash build_p2pd.sh p2pdCache v0.2.1
-```
-
 ### build_rocksdb.sh
 
 Builds RocksDB. No longer used.
