@@ -116,3 +116,5 @@ USE_SYSTEM_NIM := 0
 # Skip multiple bootstrap iterations and tool building.
 QUICK_AND_DIRTY_COMPILER := 0
 
+# Override local submodule changes during `make update`. On by default. Turned off in `make update-dev`.
+OVERRIDE := 1

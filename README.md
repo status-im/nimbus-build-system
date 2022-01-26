@@ -191,6 +191,14 @@ EXCLUDED_NIM_PACKAGES := vendor/nim-waku/vendor/nim-chronos \
 As you see, we can exclude all those "nim-dnsdisc" submodules with a single
 line, because the pattern is not anchored during the match.
 
+### OVERRIDE
+
+Whether to override any uncommitted changes to Git submodules during `make
+update`. Defaults to 1, in order to keep the old behaviour for users building
+from source.
+
+Set to 0 inside `make update-dev`, to help developers avoid losing work.
+
 ## Make targets
 
 ### build
@@ -251,6 +259,11 @@ committed files.
 
 Tell your users to run `make update` after cloning the superproject, after a
 `git pull` and after changing branches or checking out older commits.
+
+## update-dev
+
+Alternative to "update" for developers who want to avoid losing uncommitted
+work in Git submodules. `make update-dev` simply runs `make OVERRIDE=0 update`.
 
 ### update-remote
 
