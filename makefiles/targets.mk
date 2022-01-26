@@ -88,7 +88,7 @@ update-test:
 	TEE_TO_TTY="cat"; if bash -c ": >/dev/tty" &>/dev/null; then TEE_TO_TTY="tee /dev/tty"; fi; \
 	COMMAND="git status --short --untracked-files=no --ignore-submodules=untracked"; \
 	LINES=$$({ $${COMMAND} | grep 'vendor' && echo ^---top level || true; git submodule foreach --recursive --quiet "$${COMMAND} | grep . && echo ^---\$$name || true"; } | $${TEE_TO_TTY} | wc -l); \
-	if [[ "$${LINES}" -ne "0" && "$(OVERRIDE)" != "1" ]]; then echo -e "\nYou have uncommitted local changes which might be overwritten by the update. Aborting.\nIf you know better, you can re-run the command with OVERRIDE=1.\n"; exit 1; fi
+	if [[ "$${LINES}" -ne "0" && "$(OVERRIDE)" != "1" ]]; then echo -e "\nYou have uncommitted local changes which might be overwritten by the update. Aborting.\nIf you know better, you can use the 'update' target instead of 'update-dev'.\n"; exit 1; fi
 
 #- for each submodule, delete checked out files (that might prevent a fresh checkout); skip dotfiles
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
@@ -110,6 +110,10 @@ update-common: | sanity-checks update-test
 	$(GET_CURRENT_COMMIT_TIMESTAMP) > $(UPDATE_TIMESTAMP)
 	rm -rf $(NIMBLE_DIR)
 	+ "$(MAKE)" --no-print-directory deps-common
+
+# supposed to be used by developers, instead of "update", to avoid losing submodule work
+update-dev:
+	+ "$(MAKE)" OVERRIDE=0 update
 
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 $(NIM_BINARY): | sanity-checks
