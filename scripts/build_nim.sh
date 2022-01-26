@@ -89,8 +89,11 @@ nim_needs_rebuilding() {
 		cp -a "$CI_CACHE"/* "$NIM_DIR"/bin/ || true # let this one fail with an empty cache dir
 	fi
 
-	# compare the last built commit to the one requested
-	if [[ -e "${NIM_DIR}/bin/last_built_commit" && "$(cat "${NIM_DIR}/bin/last_built_commit")" == "${NIM_COMMIT_HASH}" ]]; then
+	# Compare the last built commit to the one requested.
+	# Handle the scenario where our symlink is manually deleted by the user.
+	if [[ -e "${NIM_DIR}/bin/last_built_commit" && \
+	-e "${NIM_DIR}/bin/nim${EXE_SUFFIX}" && \
+	"$(cat "${NIM_DIR}/bin/last_built_commit")" == "${NIM_COMMIT_HASH}" ]]; then
 		return $NO_REBUILD
 	elif [[ -e "${NIM_DIR}/bin/nim_commit_${NIM_COMMIT_HASH}" ]]; then
 		# we built the requested commit in the past, so we simply reuse it
