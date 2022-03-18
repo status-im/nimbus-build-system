@@ -176,9 +176,6 @@ build_nim() {
 			build_all.sh > build_all_custom.sh
 		sh build_all_custom.sh
 		rm build_all_custom.sh
-		# Nimble needs a CA cert
-		rm -f bin/cacert.pem
-		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
 	else
 		# Don't re-build it multiple times until we get identical
 		# binaries, like "build_all.sh" does. Don't build any tools
@@ -228,6 +225,12 @@ build_nim() {
 			bin/nim c -d:release --noNimblePath --skipUserCfg --skipParentCfg dist/nimble/src/nimble.nim
 			mv dist/nimble/src/nimble bin/
 		fi
+	fi
+
+	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
+		# Nimble needs a CA cert
+		rm -f bin/cacert.pem
+		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
 	fi
 
 	# record the built commit
