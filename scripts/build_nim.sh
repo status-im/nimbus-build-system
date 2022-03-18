@@ -91,7 +91,7 @@ nim_needs_rebuilding() {
 	fi
 
 	# Delete old Nim binaries, to put a limit on how much storage we use.
-	for F in "$(ls -t "${NIM_DIR}"/bin/nim_commit_* | tail -n +$((MAX_NIM_BINARIES + 1)))"; do
+	for F in "$(ls -t "${NIM_DIR}"/bin/nim_commit_* 2>/dev/null | tail -n +$((MAX_NIM_BINARIES + 1)))"; do
 		if [[ -e "${F}" ]]; then
 			rm "${F}"
 		fi
