@@ -149,7 +149,7 @@ $(NIMBLE_DIR):
 		git submodule foreach --recursive --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
 
 clean-cross:
-	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc clean $(HANDLE_OUTPUT) || true
+	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc CC=$(CC) clean $(HANDLE_OUTPUT) || true
 	+ [[ -e vendor/nim-nat-traversal/vendor/libnatpmp-upstream ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream CC=$(CC) clean $(HANDLE_OUTPUT) || true
 
 clean-common: clean-cross
