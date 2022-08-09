@@ -76,3 +76,9 @@ else
 	"$@"
 fi
 
+export NIMBUS_BUILD_SYSTEM=yes
+echo "--noNimblePath" > nimbus-build-system.paths
+for file in $(ls -d $PWD/vendor/*)
+do
+  echo --path:"\"$file\""
+done >> nimbus-build-system.paths
