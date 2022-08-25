@@ -66,6 +66,17 @@ add_submodule() {
 }
 $EXPORT_FUNC add_submodule
 
+export NIMBUS_BUILD_SYSTEM=yes
+echo "--noNimblePath" > nimbus-build-system.paths
+for file in $(ls -d $PWD/vendor/*)
+do
+  if [ -d "$file/src" ]; then
+    echo --path:"\"$file/src\""
+  else
+    echo --path:"\"$file\""
+  fi
+done >> nimbus-build-system.paths
+
 if [[ $# == 1 && $1 == "bash" ]]; then
 	# the only way to change PS1 in a child shell, apparently
 	# (we're not getting the original PS1 value in here, so set a complete and nice prompt)
@@ -75,10 +86,3 @@ else
 	# can't use "exec" here if we're getting function names as params
 	"$@"
 fi
-
-export NIMBUS_BUILD_SYSTEM=yes
-echo "--noNimblePath" > nimbus-build-system.paths
-for file in $(ls -d $PWD/vendor/*)
-do
-  echo --path:"\"$file\""
-done >> nimbus-build-system.paths
