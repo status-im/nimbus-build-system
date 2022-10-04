@@ -7,7 +7,7 @@
 
 SHELL := bash # the shell used internally by "make"
 
-CC := gcc
+CC ?= gcc
 LD := $(CC)
 
 #- extra parameters for the Nim compiler
