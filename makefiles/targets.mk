@@ -128,9 +128,9 @@ nat-libs: | libminiupnpc.a libnatpmp.a
 libminiupnpc.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
 	+ [ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc/$@ ] || \
-		PATH=".:${PATH}" "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=$(CC) $@ $(HANDLE_OUTPUT)
+		PATH=".:${PATH}" "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=$(CC) build/$@ $(HANDLE_OUTPUT)
 else
-	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc build/$@ $(HANDLE_OUTPUT)
 endif
 
 libnatpmp.a: | sanity-checks
