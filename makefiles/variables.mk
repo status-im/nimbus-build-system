@@ -7,7 +7,12 @@
 
 SHELL := bash # the shell used internally by "make"
 
+# Windows does not symlink cc to gcc
+ifeq ($(OS), Windows_NT)
+CC := gcc
+else
 CC ?= gcc
+endif
 LD := $(CC)
 
 #- extra parameters for the Nim compiler
