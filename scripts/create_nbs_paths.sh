@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd "${ABS_PATH}/../../.."
+cd "$TOP_LEVEL_DIR"
 
 echo "--noNimblePath" > nimbus-build-system.paths
 for file in $(ls -d $PWD/vendor/*)

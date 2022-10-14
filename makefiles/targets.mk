@@ -59,7 +59,7 @@ warn-jobs:
 
 nimbus-build-system-paths:
 	echo "Creating nimbus-build-system.paths"; \
-	"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nbs_paths.sh"
+	TOP_LEVEL_DIR="$(CURDIR)" "$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nbs_paths.sh"
 
 deps-common: | sanity-checks warn-update warn-jobs $(NIMBLE_DIR)
 # - don't build our Nim target if it's not going to be used
