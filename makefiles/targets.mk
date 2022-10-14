@@ -57,6 +57,10 @@ warn-jobs:
 		fi; \
 	fi
 
+nimbus-build-system-paths:
+	echo "Creating nimbus-build-system.paths"; \
+	"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nbs_paths.sh"
+
 deps-common: | sanity-checks warn-update warn-jobs $(NIMBLE_DIR)
 # - don't build our Nim target if it's not going to be used
 ifeq ($(USE_SYSTEM_NIM), 0)
@@ -99,7 +103,7 @@ update-test:
 #- deletes the ".nimble" dir and executes the "deps" target
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
-update-common: | sanity-checks update-test
+update-common: | sanity-checks update-test nimbus-build-system-paths
 	git submodule foreach --quiet 'git ls-files --exclude-standard --recurse-submodules -z -- ":!:.*" | xargs -0 rm -rf'
 	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
