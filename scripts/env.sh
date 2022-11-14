@@ -67,7 +67,8 @@ add_submodule() {
 $EXPORT_FUNC add_submodule
 
 export NIMBUS_BUILD_SYSTEM=yes
-echo "--noNimblePath" > nimbus-build-system.paths.tmp
+nbsPathsFile="$(mktemp)"
+echo "--noNimblePath" > "${nbsPathsFile}"
 for file in $(ls -d $PWD/vendor/*)
 do
   if uname | grep -qiE "mingw|msys"; then
@@ -78,8 +79,8 @@ do
   else
     echo --path:"\"$file\""
   fi
-done >> nimbus-build-system.paths.tmp
-mv nimbus-build-system.paths{.tmp,}
+done >> "${nbsPathsFile}"
+mv "${nbsPathsFile}" nimbus-build-system.paths
 
 if [[ $# == 1 && $1 == "bash" ]]; then
 	# the only way to change PS1 in a child shell, apparently
