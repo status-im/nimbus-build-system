@@ -32,5 +32,5 @@ cleanup() {
 [ -e "$NIMS" ] || { ln -s "$F" "$NIMS"; trap cleanup EXIT; }
 
 # can't have an "exec" here or the EXIT pseudo-signal won't be triggered
-$(dirname $0)/env.sh nim "$@" "$NIMS"
+$(dirname $0)/env.sh "$NIMC" "$@" "$NIMS"
 
