@@ -47,7 +47,7 @@ update: | update-common
 # building Nim programs
 foo bar: | build deps
 	echo -e $(BUILD_MSG) "build/$@" && \
-		$(ENV_SCRIPT) nim c -o:build/$@ $(NIM_PARAMS) "$@.nim"
+		$(ENV_SCRIPT) "$(NIMC)" c -o:build/$@ $(NIM_PARAMS) "$@.nim"
 
 clean: | clean-common
 	rm -rf build/{foo,bar}

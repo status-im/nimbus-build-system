@@ -11,6 +11,8 @@
 ## get native Windows paths on Mingw
 #uname | grep -qi mingw && PWD_CMD="pwd -W"
 
+export NIMC=${NIMC:-nim}
+
 # We use ${BASH_SOURCE[0]} instead of $0 to allow sourcing this file
 # and we fall back to a Zsh-specific special var to also support Zsh.
 export REL_PATH="$(dirname ${BASH_SOURCE[0]:-${(%):-%x}})"
@@ -34,7 +36,7 @@ export PATH="${NIMBLE_DIR}/bin:${PATH}"
 if [[ "$USE_SYSTEM_NIM" != "1" ]]; then
 	export PATH="${NIM_PATH}:${PATH}"
 else
-	echo "[using system Nim: $(which nim)]" 1>&2
+	echo "[using system Nim: $(which $NIMC)]" 1>&2
 fi
 
 if [[ -n "${NIM_COMMIT}" && "${NIM_COMMIT}" != "nimbus" ]]; then
