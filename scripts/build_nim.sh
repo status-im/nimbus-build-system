@@ -10,9 +10,9 @@
 
 set -e
 
-: ${CSOURCES_REPO:=https://github.com/nim-lang/csources_v1.git}
+: ${CSOURCES_REPO:=https://github.com/nim-lang/csources_v2.git}
 # Git commits
-: ${CSOURCES_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff} # 1.0.11 + support for Apple's M1
+: ${CSOURCES_COMMIT:=86742fb02c6606ab01a532a0085784effb2e753e}
 : ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
