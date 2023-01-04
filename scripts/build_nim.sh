@@ -129,12 +129,12 @@ build_nim() {
 
 	# Git repos for csources and Nimble
 	if [[ ! -d "$CSOURCES_DIR" ]]; then
-		if git merge-base --is-ancestor $CSOURCES_V2_START_COMMIT HEAD; then
-		  CSOURCES_REPO=$CSOURCES_V1_REPO
-		  CSOURCES_COMMIT=$CSOURCES_V1_COMMIT
-		else
+		if git merge-base --is-ancestor $CSOURCES_V2_START_COMMIT $NIM_COMMIT_HASH; then
 		  CSOURCES_REPO=$CSOURCES_V2_REPO
 		  CSOURCES_COMMIT=$CSOURCES_V2_COMMIT
+		else
+		  CSOURCES_REPO=$CSOURCES_V1_REPO
+		  CSOURCES_COMMIT=$CSOURCES_V1_COMMIT
 		fi
 
 		mkdir -p "$CSOURCES_DIR"
