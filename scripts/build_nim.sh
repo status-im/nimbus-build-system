@@ -31,7 +31,7 @@ CI_CACHE="$4"
 
 ## env vars
 # verbosity level
-[[ -z "$V" ]] && V=0
+[[ -z "$V" ]] && V=1
 [[ -z "$CC" ]] && CC="gcc"
 # to build csources in parallel, set MAKE="make -jN"
 [[ -z "$MAKE" ]] && MAKE="make"
