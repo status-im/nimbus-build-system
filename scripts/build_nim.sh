@@ -8,7 +8,7 @@
 # at your option. This file may not be copied, modified, or distributed except
 # according to those terms.
 
-set -e
+set -xe
 
 # Git commits
 : ${CSOURCES_V1_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff}
