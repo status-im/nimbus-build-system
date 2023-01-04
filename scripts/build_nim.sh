@@ -8,7 +8,7 @@
 # at your option. This file may not be copied, modified, or distributed except
 # according to those terms.
 
-set -xe
+set -e
 
 # Git commits
 : ${CSOURCES_V1_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff}
@@ -31,7 +31,7 @@ CI_CACHE="$4"
 
 ## env vars
 # verbosity level
-[[ -z "$V" ]] && V=1
+[[ -z "$V" ]] && V=0
 [[ -z "$CC" ]] && CC="gcc"
 # to build csources in parallel, set MAKE="make -jN"
 [[ -z "$MAKE" ]] && MAKE="make"
