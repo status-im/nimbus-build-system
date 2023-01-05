@@ -11,7 +11,13 @@
 set -e
 
 # Git commits
-: ${CSOURCES_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff} # 1.0.11 + support for Apple's M1
+: ${CSOURCES_V1_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff}
+: ${CSOURCES_V2_COMMIT:=86742fb02c6606ab01a532a0085784effb2e753e}
+: ${CSOURCES_V1_REPO:=https://github.com/nim-lang/csources_v1.git}
+: ${CSOURCES_V2_REPO:=https://github.com/nim-lang/csources_v2.git}
+
+# After this Nim commit, use csources v2
+: ${CSOURCES_V2_START_COMMIT:=f7c203fb6c89b5cef83c4f326aeb23ef8c4a2c40}
 : ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
@@ -123,9 +129,17 @@ build_nim() {
 
 	# Git repos for csources and Nimble
 	if [[ ! -d "$CSOURCES_DIR" ]]; then
+		if git merge-base --is-ancestor $CSOURCES_V2_START_COMMIT $NIM_COMMIT_HASH; then
+		  CSOURCES_REPO=$CSOURCES_V2_REPO
+		  CSOURCES_COMMIT=$CSOURCES_V2_COMMIT
+		else
+		  CSOURCES_REPO=$CSOURCES_V1_REPO
+		  CSOURCES_COMMIT=$CSOURCES_V1_COMMIT
+		fi
+
 		mkdir -p "$CSOURCES_DIR"
 		pushd "$CSOURCES_DIR"
-		git clone https://github.com/nim-lang/csources_v1.git .
+		git clone $CSOURCES_REPO .
 		git checkout $CSOURCES_COMMIT
 		popd
 	fi
