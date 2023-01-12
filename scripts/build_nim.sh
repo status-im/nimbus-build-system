@@ -259,7 +259,7 @@ build_nim() {
 	if [[ -n "$CI_CACHE" ]]; then
 		rm -rf "$CI_CACHE"
 		mkdir "$CI_CACHE"
-		cp -a "$NIM_DIR"/bin/* "$CI_CACHE"/
+		cp "$NIM_DIR"/bin/* "$CI_CACHE"/
 	fi
 }
 
