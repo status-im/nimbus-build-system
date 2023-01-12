@@ -8,7 +8,7 @@
 # at your option. This file may not be copied, modified, or distributed except
 # according to those terms.
 
-set -xe
+set -e
 
 # Git commits
 : ${CSOURCES_V1_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff}
@@ -256,8 +256,6 @@ build_nim() {
 
 	# update the CI cache
 	popd # we were in $NIM_DIR
-
-	ls "$NIM_DIR"/bin/*
 	if [[ -n "$CI_CACHE" ]]; then
 		rm -rf "$CI_CACHE"
 		mkdir "$CI_CACHE"
