@@ -70,6 +70,8 @@ $EXPORT_FUNC add_submodule
 
 export NIMBUS_BUILD_SYSTEM=yes
 
+TOP_LEVEL_DIR="${ABS_PATH}/../../../" "${ABS_PATH}/create_nbs_paths.sh"
+
 if [[ ! -n "$NBS_ONLY_LOAD_ENV_VARS" ]]; then
   if [[ $# == 1 && $1 == "bash" ]]; then
     # the only way to change PS1 in a child shell, apparently

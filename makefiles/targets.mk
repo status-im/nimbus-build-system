@@ -103,7 +103,7 @@ update-test:
 #- deletes the ".nimble" dir and executes the "deps" target
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
-update-common: | sanity-checks update-test nimbus-build-system-paths
+update-common: | sanity-checks update-test
 	git submodule foreach --quiet 'git ls-files --exclude-standard --recurse-submodules -z -- ":!:.*" | xargs -0 rm -rf'
 	git submodule update --init --recursive || true
 	# changing URLs in a submodule's submodule means we have to sync and update twice
