@@ -130,7 +130,7 @@ build_nim() {
 	if grep -q skipIntegrityCheck koch.nim; then
 		# Run Nim buildchain
 		. ci/funs.sh
-		nimBuildCsourcesIfNeeded
+		nimBuildCsourcesIfNeeded $UCPU
 		bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
 		./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
