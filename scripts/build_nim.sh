@@ -142,6 +142,9 @@ build_nim() {
 		fi
 	else
 		# Custom buildchain for older versions
+		# TODO Remove this once the default NIM_COMMIT supports `--skipIntegrityCheck`
+		# We will still be able to compile older versions by removing the flag,
+		# which will just waste a bit of CPU
 
 		# Git repos for csources and Nimble
 		if [[ ! -d "$CSOURCES_DIR" ]]; then
