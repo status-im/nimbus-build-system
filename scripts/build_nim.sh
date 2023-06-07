@@ -74,7 +74,7 @@ nim_needs_rebuilding() {
 			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 			# (This includes upstream branches and tags that might be missing from our fork.)
 			git remote add upstream https://github.com/nim-lang/Nim
-			git fetch --all
+			git fetch --all --tags --quiet
 			git checkout -q ${NIM_COMMIT}
 		fi
 		# In case the local branch diverged and a fast-forward merge is not possible.
