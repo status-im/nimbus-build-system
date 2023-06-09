@@ -259,12 +259,12 @@ build_nim() {
 				mv dist/nimble/src/nimble bin/
 			fi
 		fi
+	fi
 
-		if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
-			# Nimble needs a CA cert
-			rm -f bin/cacert.pem
-			curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
-		fi
+	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
+		# Nimble needs a CA cert
+		rm -f bin/cacert.pem
+		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
 	fi
 
 	# record the built commit
