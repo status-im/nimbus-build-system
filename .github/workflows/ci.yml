@@ -14,25 +14,26 @@ jobs:
         target:
           - os: linux
             cpu: amd64
-          - os: linux
-            cpu: i386
-          - os: macos
-            cpu: amd64
-          - os: windows
-            cpu: amd64
-          - os: windows
-            cpu: i386
-        branch: [version-1-6, version-2-0, devel]
+          #- os: linux
+          #  cpu: i386
+          #- os: macos
+          #  cpu: amd64
+          #- os: windows
+          #  cpu: amd64
+          #- os: windows
+          #  cpu: i386
+        #branch: [version-1-6, version-2-0, devel]
+        branch: [version-1-6]
         include:
           - target:
               os: linux
             builder: ubuntu-20.04
-          - target:
-              os: macos
-            builder: macos-12
-          - target:
-              os: windows
-            builder: windows-latest
+          #- target:
+          #    os: macos
+          #  builder: macos-12
+          #- target:
+          #    os: windows
+          #  builder: windows-latest
 
     defaults:
       run:
@@ -136,4 +137,5 @@ jobs:
             QUICK_AND_DIRTY_COMPILER=1 QUICK_AND_DIRTY_NIMBLE=1 CC=gcc \
             bash scripts/build_nim.sh nim csources dist/nimble NimBinaries
           echo '${{ github.workspace }}/nim/bin' >> $GITHUB_PATH
-          nim -v
+          ls ./nim/bin
+          ./nim/bin/nim -v
