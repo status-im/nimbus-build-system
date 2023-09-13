@@ -135,5 +135,10 @@ jobs:
           env MAKE="${MAKE_CMD} -j${ncpu}" ARCH_OVERRIDE=${PLATFORM} NIM_COMMIT=${{ matrix.branch }} \
             QUICK_AND_DIRTY_COMPILER=1 QUICK_AND_DIRTY_NIMBLE=1 CC=gcc \
             bash scripts/build_nim.sh nim csources dist/nimble NimBinaries
-          echo '$PWD/nim/bin' >> $GITHUB_PATH
-          nim -v
+          echo '${{ github.workspace }}/nim/bin' >> $GITHUB_PATH
+
+      - name: Run tests
+        run: |
+          nim --version
+          nimble --version
+          gcc --version
