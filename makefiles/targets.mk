@@ -139,7 +139,7 @@ endif
 
 libnatpmp.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
-	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream CC=$(CC) CFLAGS="-Wall -Wno-cpp -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream OS=mingw CC=$(CC) CFLAGS="-Wall -Wno-cpp -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" $@ $(HANDLE_OUTPUT)
 else
 	+ "$(MAKE)" CFLAGS="-Wall -Wno-cpp -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream $@ $(HANDLE_OUTPUT)
 endif
