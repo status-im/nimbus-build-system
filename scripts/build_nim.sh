@@ -11,7 +11,7 @@
 set -e
 
 # Git commits
-: ${CSOURCES_V1_COMMIT:=a8a5241f9475099c823cfe1a5e0ca4022ac201ff}
+: ${CSOURCES_V1_COMMIT:=561b417c65791cd8356b5f73620914ceff845d10}
 : ${CSOURCES_V2_COMMIT:=86742fb02c6606ab01a532a0085784effb2e753e}
 : ${CSOURCES_V1_REPO:=https://github.com/nim-lang/csources_v1.git}
 : ${CSOURCES_V2_REPO:=https://github.com/nim-lang/csources_v2.git}
