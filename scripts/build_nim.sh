@@ -10,23 +10,14 @@
 
 set -e
 
-# Git commits
-: ${CSOURCES_V1_COMMIT:=561b417c65791cd8356b5f73620914ceff845d10}
-: ${CSOURCES_V2_COMMIT:=86742fb02c6606ab01a532a0085784effb2e753e}
-: ${CSOURCES_V1_REPO:=https://github.com/nim-lang/csources_v1.git}
-: ${CSOURCES_V2_REPO:=https://github.com/nim-lang/csources_v2.git}
-
-# After this Nim commit, use csources v2
-: ${CSOURCES_V2_START_COMMIT:=f7c203fb6c89b5cef83c4f326aeb23ef8c4a2c40}
-: ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
 NIM_DIR="$1"
-CSOURCES_DIR="$2" # can be relative to NIM_DIR
-NIMBLE_DIR="$3" # can be relative to NIM_DIR
+CSOURCES_DIR="$2" # can be relative to NIM_DIR; only used when `skipIntegrityCheck` unsupported
+NIMBLE_DIR="$3" # can be relative to NIM_DIR; only used when `skipIntegrityCheck` unsupported
 CI_CACHE="$4"
 
 ## env vars
@@ -128,7 +119,11 @@ build_nim() {
 	pushd "$NIM_DIR"
 
 	if grep -q skipIntegrityCheck koch.nim; then
-		# Run Nim buildchain
+		# Run Nim buildchain, with matching dependency versions
+		# - CSOURCES_REPO from Nim/config/build_config.txt (nim_csourcesUrl)
+		# - CSOURCES_COMMIT from Nim/config/build_config.txt (nim_csourcesHash)
+		# - NIMBLE_REPO from Nim/koch.nim (bundleNimbleExe)
+		# - NIMBLE_COMMIT from Nim/koch.nim (NimbleStableCommit)
 		. ci/funs.sh
 		NIMCORES=1 nimBuildCsourcesIfNeeded $UCPU
 		bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
@@ -141,6 +136,17 @@ build_nim() {
 			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		fi
 	else
+		# Git commits
+		: ${CSOURCES_V1_COMMIT:=561b417c65791cd8356b5f73620914ceff845d10}
+		: ${CSOURCES_V2_COMMIT:=86742fb02c6606ab01a532a0085784effb2e753e}
+		: ${CSOURCES_V1_REPO:=https://github.com/nim-lang/csources_v1.git}
+		: ${CSOURCES_V2_REPO:=https://github.com/nim-lang/csources_v2.git}
+
+		# After this Nim commit, use csources v2
+		: ${CSOURCES_V2_START_COMMIT:=f7c203fb6c89b5cef83c4f326aeb23ef8c4a2c40}
+		: ${NIMBLE_REPO:=https://github.com/nim-lang/nimble.git}
+		: ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
+
 		# Custom buildchain for older versions
 		# TODO Remove this once the default NIM_COMMIT supports `--skipIntegrityCheck`
 		# We will still be able to compile older versions by removing the flag,
@@ -170,7 +176,7 @@ build_nim() {
 		if [[ ! -d "$NIMBLE_DIR" ]]; then
 			mkdir -p "$NIMBLE_DIR"
 			pushd "$NIMBLE_DIR"
-			git clone https://github.com/nim-lang/nimble.git .
+			git clone $NIMBLE_REPO .
 			git checkout $NIMBLE_COMMIT
 			# we have to delete .git or koch.nim will checkout a branch tip, overriding our target commit
 			rm -rf .git

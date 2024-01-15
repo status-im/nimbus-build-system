@@ -85,7 +85,7 @@ build-nim: | sanity-checks
 		MAKE="$(MAKE)" \
 		ARCH_OVERRIDE=$(ARCH_OVERRIDE) \
 		QUICK_AND_DIRTY_COMPILER=$(QUICK_AND_DIRTY_COMPILER) \
-		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources-v1 ../nimble "$(CI_CACHE)"
+		"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/build_nim.sh" "$(NIM_DIR)" ../Nim-csources ../nimble "$(CI_CACHE)"
 
 # Check if the update might cause loss of work. Abort, if so, while allowing an override mechanism.
 update-test:
