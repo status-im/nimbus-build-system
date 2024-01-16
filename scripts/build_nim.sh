@@ -12,6 +12,8 @@ set -e
 
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
+# The actual repository we clone from when specifying a commit hash.
+NIM_REPO_URL="${NIM_REPO:-'https://github.com/nim-lang/Nim'}"
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
@@ -64,7 +66,7 @@ nim_needs_rebuilding() {
 		if ! git checkout -q ${NIM_COMMIT} 2>/dev/null; then
 			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 			# (This includes upstream branches and tags that might be missing from our fork.)
-			git remote add upstream https://github.com/nim-lang/Nim
+			git remote add upstream "${NIM_REPO_URL}"
 			git fetch --all --tags --quiet
 			git checkout -q ${NIM_COMMIT}
 		fi
