@@ -13,7 +13,7 @@ set -e
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
 # The actual repository we clone from when specifying a commit hash.
-NIM_REPO_URL="${NIM_REPO:-'https://github.com/nim-lang/Nim'}"
+NIM_REPO_URL="${NIM_REPO:-https://github.com/nim-lang/Nim}"
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
