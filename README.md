@@ -181,7 +181,7 @@ use a fork from somewhere else, you can set this to the repo's URL.
 As before, you will need to specify this again when using this non-default Nim
 compiler version:
 
-`make -j8 NIM_COMMIT="4561f01" NIM_COMMIT_REPO="https://github.com/myorg/my-nim-fork" nimbus_beacon_node`
+`make -j8 NIM_COMMIT="4561f01" NIM_REPO="https://github.com/myorg/my-nim-fork" nimbus_beacon_node`
 
 ### EXCLUDED_NIM_PACKAGES
 
