@@ -66,6 +66,7 @@ nim_needs_rebuilding() {
 		if ! git checkout -q ${NIM_COMMIT} 2>/dev/null; then
 			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 			# (This includes upstream branches and tags that might be missing from our fork.)
+			git remote remove upstream 2>/dev/null || true
 			git remote add upstream "${NIM_REPO_URL}"
 			git fetch --all --tags --quiet
 			git checkout -q ${NIM_COMMIT}
