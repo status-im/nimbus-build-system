@@ -27,7 +27,7 @@ NIM_PARAMS := $(NIM_PARAMS) --verbosity:$(V)
 HANDLE_OUTPUT :=
 SILENT_TARGET_PREFIX := disabled
 ifeq ($(V), 0)
-  NIM_PARAMS := $(NIM_PARAMS) --hints:off
+#   NIM_PARAMS := $(NIM_PARAMS) --hints:off
   # don't swallow stderr, in case it's important
   HANDLE_OUTPUT := >/dev/null
   SILENT_TARGET_PREFIX :=
