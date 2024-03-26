@@ -150,7 +150,7 @@ endif
 $(NIMBLE_DIR):
 	mkdir -p $(NIMBLE_DIR)/pkgs
 	NIMBLE_DIR="$(CURDIR)/$(NIMBLE_DIR)" PWD_CMD="$(PWD)" EXCLUDED_NIM_PACKAGES="$(EXCLUDED_NIM_PACKAGES)" \
-		git submodule foreach --recursive --quiet '$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh "$$sm_path"'
+		git submodule foreach --recursive --quiet '"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh" "$$sm_path"'
 
 clean-cross:
 	+ [[ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc ]] && "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc CC=$(CC) clean $(HANDLE_OUTPUT) || true
