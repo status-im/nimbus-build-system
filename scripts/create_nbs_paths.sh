@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
 cd "$TOP_LEVEL_DIR"
 
@@ -9,17 +11,17 @@ cd "$TOP_LEVEL_DIR"
 # invocations may get interleaved.
 temp_nbs_paths=$(mktemp nimbus-build-system.paths.XXXXXXXXXXXXXXX)
 
-echo "--noNimblePath" > $temp_nbs_paths
-for file in $(ls -d $PWD/vendor/*)
+echo "--noNimblePath" > "${temp_nbs_paths}"
+for file in $(ls -d "$PWD/vendor"/*)
 do
   if uname | grep -qiE "mingw|msys"; then
-    file=$(cygpath -m $file)
+    file=$(cygpath -m "${file}")
   fi
   if [ -d "$file/src" ]; then
     echo --path:"\"$file/src\""
   else
     echo --path:"\"$file\""
   fi
-done >> $temp_nbs_paths
+done >> "${temp_nbs_paths}"
 
-mv $temp_nbs_paths nimbus-build-system.paths
+mv "${temp_nbs_paths}" nimbus-build-system.paths
