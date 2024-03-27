@@ -134,14 +134,14 @@ ifeq ($(OS), Windows_NT)
 	+ [ -e vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc/$@ ] || \
 		PATH=".;$${PATH}" "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc -f Makefile.mingw CC=$(CC) $@ $(HANDLE_OUTPUT)
 else
-	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc build/$@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/miniupnp/miniupnpc CC=$(CC) build/$@ $(HANDLE_OUTPUT)
 endif
 
 libnatpmp.a: | sanity-checks
 ifeq ($(OS), Windows_NT)
 	+ "$(MAKE)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream OS=mingw CC=$(CC) CFLAGS="-Wall -Wno-cpp -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" $@ $(HANDLE_OUTPUT)
 else
-	+ "$(MAKE)" CFLAGS="-Wall -Wno-cpp -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream $@ $(HANDLE_OUTPUT)
+	+ "$(MAKE)" CFLAGS="-Wall -Wno-cpp -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4 $(CFLAGS)" -C vendor/nim-nat-traversal/vendor/libnatpmp-upstream CC=$(CC) $@ $(HANDLE_OUTPUT)
 endif
 
 #- depends on Git submodules being initialised
