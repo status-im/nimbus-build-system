@@ -169,7 +169,7 @@ You also need to specify it when using this non-default Nim compiler version:
 
 `make -j8 NIM_COMMIT="v1.2.6" nimbus_beacon_node`
 
-### NIM_REPO
+### NIM_COMMIT_REPO
 
 `NIM_COMMIT` will try to fetch commits from the 
 [status-im fork](https://github.com/status-im/Nim), followed by the
@@ -181,7 +181,7 @@ use a fork from somewhere else, you can set this to the repo's URL.
 As before, you will need to specify this again when using this non-default Nim
 compiler version:
 
-`make -j8 NIM_COMMIT="4561f01" NIM_REPO="https://github.com/myorg/my-nim-fork" nimbus_beacon_node`
+`make -j8 NIM_COMMIT="4561f01" NIM_COMMIT_REPO="https://github.com/myorg/my-nim-fork" nimbus_beacon_node`
 
 ### EXCLUDED_NIM_PACKAGES
 
