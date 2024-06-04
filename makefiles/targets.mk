@@ -240,7 +240,7 @@ ifeq ($(OS), Windows_NT)
   endif
 
   ROCKSDB_ARCHIVE := nimbus-deps.zip
-  ROCKSDB_URL := https://github.com/status-im/nimbus-deps/releases/download/nimbus-deps/$(ROCKSDB_ARCHIVE)
+  ROCKSDB_URL := https://github.com/status-im/nimbus-deps/releases/download/rocksdb-9.1.0/$(ROCKSDB_ARCHIVE)
   CURL := curl -O -L
   UNZIP := unzip -o
 
