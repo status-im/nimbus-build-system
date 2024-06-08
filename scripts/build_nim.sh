@@ -94,20 +94,20 @@ nim_needs_rebuilding() {
 	fi
 
 	if [[ ! -d "$NIMBLE_DIR" ]] && [[ -n "$NIMBLE_COMMIT" ]]; then
-    echo "Downloading Nimble sources..."
-    mkdir -p "$NIMBLE_DIR"
-    pushd "$NIMBLE_DIR"
-    git clone https://github.com/nim-lang/nimble.git .
-    git checkout $NIMBLE_COMMIT
-    # we have to delete .git or koch.nim will checkout a branch tip, overriding our target commit
-  	rm -rf .git
-    popd
-  fi
-  if [[ "$NIMBLE_DIR" != "dist/nimble" ]]; then
-    mkdir -p dist
-  	rm -rf dist/nimble
-  	ln -s ../"$NIMBLE_DIR" dist/nimble
-  fi
+		echo "Downloading Nimble sources..."
+		mkdir -p "$NIMBLE_DIR"
+		pushd "$NIMBLE_DIR"
+		git clone https://github.com/nim-lang/nimble.git .
+		git checkout $NIMBLE_COMMIT
+		# we have to delete .git or koch.nim will checkout a branch tip, overriding our target commit
+		rm -rf .git
+	popd
+	fi
+	if [[ "$NIMBLE_DIR" != "dist/nimble" ]]; then
+		mkdir -p dist
+		rm -rf dist/nimble
+		ln -s ../"$NIMBLE_DIR" dist/nimble
+	fi
 
 	popd >/dev/null
 
