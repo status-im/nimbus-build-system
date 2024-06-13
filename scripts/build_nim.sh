@@ -70,6 +70,7 @@ nim_needs_rebuilding() {
 			if git remote | grep -q "^upstream$"; then
 				# upstream already exists, call it "extra"
 				NEW_REMOTE="extra"
+				git remote remove extra 2>/dev/null || true
 			fi
 			git remote add "${NEW_REMOTE}" "${NIM_COMMIT_REPO_URL}"
 			git fetch --all --tags --quiet
