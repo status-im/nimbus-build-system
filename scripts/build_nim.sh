@@ -118,6 +118,11 @@ build_nim() {
 	# working directory
 	pushd "$NIM_DIR"
 
+	# Otherwise, when updating from pre-v2.0.10 to v2.0.10 or later,
+	# https://github.com/nim-lang/Nim/issues/24173 occurs. Simulates
+	# https://github.com/nim-lang/Nim/pull/24189 as a workaround.
+	rm -rf dist/checksums
+
 	if grep -q skipIntegrityCheck koch.nim; then
 		# Run Nim buildchain, with matching dependency versions
 		# - CSOURCES_REPO from Nim/config/build_config.txt (nim_csourcesUrl)
