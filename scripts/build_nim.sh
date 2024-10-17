@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-# used in Travis CI and AppVeyor scripts
-
-# Copyright (c) 2018-2020 Status Research & Development GmbH. Licensed under
+# Copyright (c) 2018-2024 Status Research & Development GmbH. Licensed under
 # either of:
 # - Apache License, version 2.0
 # - MIT license
 # at your option. This file may not be copied, modified, or distributed except
 # according to those terms.
 
-set -e
+set -eo pipefail
 
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
@@ -121,7 +119,14 @@ build_nim() {
 	# Otherwise, when updating from pre-v2.0.10 to v2.0.10 or later,
 	# https://github.com/nim-lang/Nim/issues/24173 occurs. Simulates
 	# https://github.com/nim-lang/Nim/pull/24189 as a workaround.
-	rm -rf dist/checksums
+	#
+	# When building Nimbus from a Nix derivation which adds this as part of
+	# a preBuild phase, do not use this hack, because it's both unnecessary
+	# and prevents Nim from building.
+	NIX_BUILD_TOP="${NIX_BUILD_TOP:-}"
+	if [[ "${NIX_BUILD_TOP}" != "/build" ]]; then
+		rm -rf dist/checksums
+	fi
 
 	if grep -q skipIntegrityCheck koch.nim; then
 		# Run Nim buildchain, with matching dependency versions
