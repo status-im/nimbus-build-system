@@ -62,7 +62,14 @@ nim_needs_rebuilding() {
 		if ! git checkout -q ${NIM_COMMIT} 2>/dev/null; then
 			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 			# (This includes upstream branches and tags that might be missing from our fork.)
-			git remote add upstream https://github.com/nim-lang/Nim
+			if ! git remote | grep -q "^upstream$"; then
+				git remote add upstream https://github.com/nim-lang/Nim
+			fi
+			# If the user has specified a custom repo, add it here as a remote as well.
+			if [[ -n "${NIM_COMMIT_REPO}" ]]; then
+				git remote remove extra 2>/dev/null || true
+				git remote add extra "${NIM_COMMIT_REPO}"
+			fi
 			git fetch --all --tags --quiet
 			git checkout -q ${NIM_COMMIT}
 		fi
