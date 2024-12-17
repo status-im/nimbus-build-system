@@ -35,12 +35,9 @@ UCPU=""
 if uname | grep -qiE "mingw|msys"; then
 	ON_WINDOWS=1
 	EXE_SUFFIX=".exe"
-	# otherwise it fails in AppVeyor due to https://github.com/git-for-windows/git/issues/2495
-	GIT_TIMESTAMP_ARG="--date=unix" # available since Git 2.9.4
 else
 	ON_WINDOWS=0
 	EXE_SUFFIX=""
-	GIT_TIMESTAMP_ARG="--date=format-local:%s" # available since Git 2.7.0
 fi
 
 NIM_BINARY="${NIM_DIR}/bin/nim${EXE_SUFFIX}"
@@ -59,7 +56,7 @@ nim_needs_rebuilding() {
 	if [[ -n "${NIM_COMMIT}" ]]; then
 		# support old Git versions, like the one from Ubuntu-18.04
 		git restore . 2>/dev/null || git reset --hard
-		if ! git checkout -q ${NIM_COMMIT} 2>/dev/null; then
+		if ! git checkout -q "${NIM_COMMIT}" 2>/dev/null; then
 			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
 			# (This includes upstream branches and tags that might be missing from our fork.)
 			if ! git remote | grep -q "^upstream$"; then
@@ -71,17 +68,17 @@ nim_needs_rebuilding() {
 				git remote add extra "${NIM_COMMIT_REPO}"
 			fi
 			git fetch --all --tags --quiet
-			git checkout -q ${NIM_COMMIT}
+			git checkout -q "${NIM_COMMIT}"
 		fi
 		# In case the local branch diverged and a fast-forward merge is not possible.
 		git fetch || true
-		git reset -q --hard origin/${NIM_COMMIT} 2>/dev/null || true
+		git reset -q --hard origin/"${NIM_COMMIT}" 2>/dev/null || true
 		# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
 		git pull -q 2>/dev/null || true
-		git checkout -q ${NIM_COMMIT}
+		git checkout -q "${NIM_COMMIT}"
 		# We can't use "rev-parse" here, because it would return the tag object's
 		# hash instead of the commit hash, when NIM_COMMIT is a tag.
-		NIM_COMMIT_HASH="$(git rev-list -n 1 ${NIM_COMMIT})"
+		NIM_COMMIT_HASH="$(git rev-list -n 1 "${NIM_COMMIT}")"
 	else
 		# NIM_COMMIT is empty, so assume the commit we need is already checked out
 		NIM_COMMIT_HASH="$(git rev-list -n 1 HEAD)"
@@ -109,7 +106,7 @@ nim_needs_rebuilding() {
 		# we built the requested commit in the past, so we simply reuse it
 		rm -f "${NIM_DIR}/bin/nim${EXE_SUFFIX}"
 		ln -s "nim_commit_${NIM_COMMIT_HASH}" "${NIM_DIR}/bin/nim${EXE_SUFFIX}"
-		echo ${NIM_COMMIT_HASH} > "${NIM_DIR}/bin/last_built_commit"
+		echo "${NIM_COMMIT_HASH}" > "${NIM_DIR}/bin/last_built_commit"
 		return $NO_REBUILD
 	else
 		return $REBUILD
@@ -147,10 +144,10 @@ build_nim() {
 		./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
-			./koch tools -d:release --skipUserCfg --warnings:off --hints:off
+			./koch tools -d:release --skipUserCfg --warnings:off --hints:off --styleCheck:off
 		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
 			# We just want nimble
-			./koch nimble -d:release --skipUserCfg --warnings:off --hints:off
+			./koch nimble -d:release --skipUserCfg --warnings:off --hints:off --styleCheck:off
 		fi
 	else
 		# Git commits
@@ -171,7 +168,7 @@ build_nim() {
 
 		# Git repos for csources and Nimble
 		if [[ ! -d "$CSOURCES_DIR" ]]; then
-			if git merge-base --is-ancestor $CSOURCES_V2_START_COMMIT $NIM_COMMIT_HASH; then
+			if git merge-base --is-ancestor "${CSOURCES_V2_START_COMMIT}" "${NIM_COMMIT_HASH}"; then
 			  CSOURCES_REPO=$CSOURCES_V2_REPO
 			  CSOURCES_COMMIT=$CSOURCES_V2_COMMIT
 			else
@@ -181,8 +178,8 @@ build_nim() {
 
 			mkdir -p "$CSOURCES_DIR"
 			pushd "$CSOURCES_DIR"
-			git clone $CSOURCES_REPO .
-			git checkout $CSOURCES_COMMIT
+			git clone "${CSOURCES_REPO}" .
+			git checkout "${CSOURCES_COMMIT}"
 			popd
 		fi
 		if [[ "$CSOURCES_DIR" != "csources" ]]; then
@@ -193,8 +190,8 @@ build_nim() {
 		if [[ ! -d "$NIMBLE_DIR" ]]; then
 			mkdir -p "$NIMBLE_DIR"
 			pushd "$NIMBLE_DIR"
-			git clone $NIMBLE_REPO .
-			git checkout $NIMBLE_COMMIT
+			git clone "${NIMBLE_REPO}" .
+			git checkout "${NIMBLE_COMMIT}"
 			# we have to delete .git or koch.nim will checkout a branch tip, overriding our target commit
 			rm -rf .git
 			popd
@@ -210,7 +207,7 @@ build_nim() {
 		pushd csources
 		if [[ "$ON_WINDOWS" == "0" ]]; then
 			$MAKE $UCPU clean
-			$MAKE $UCPU LD=$CC
+			$MAKE $UCPU LD="${CC}"
 		else
 			$MAKE myos=windows $UCPU clean
 			$MAKE myos=windows $UCPU CC=gcc LD=gcc
@@ -278,7 +275,7 @@ build_nim() {
 
 			# Do we want Nimble in this quick build?
 			if [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
-				bin/nim c -d:release --noNimblePath --skipUserCfg dist/nimble/src/nimble.nim
+				bin/nim c -d:release --noNimblePath --skipUserCfg --styleCheck:off dist/nimble/src/nimble.nim
 				mv dist/nimble/src/nimble bin/
 			fi
 		fi
@@ -291,11 +288,11 @@ build_nim() {
 	fi
 
 	# record the built commit
-	echo ${NIM_COMMIT_HASH} > bin/last_built_commit
+	echo "${NIM_COMMIT_HASH}" > bin/last_built_commit
 
 	# create the symlink
-	mv bin/nim bin/nim_commit_${NIM_COMMIT_HASH}
-	ln -s nim_commit_${NIM_COMMIT_HASH} bin/nim${EXE_SUFFIX}
+	mv bin/nim bin/nim_commit_"${NIM_COMMIT_HASH}"
+	ln -s nim_commit_"${NIM_COMMIT_HASH}" bin/nim${EXE_SUFFIX}
 
 	# update the CI cache
 	popd # we were in $NIM_DIR
