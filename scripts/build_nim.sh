@@ -278,7 +278,7 @@ build_nim() {
 
 			# Do we want Nimble in this quick build?
 			if [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
-				bin/nim c -d:release --noNimblePath --skipUserCfg --skipParentCfg dist/nimble/src/nimble.nim
+				bin/nim c -d:release --noNimblePath --skipUserCfg dist/nimble/src/nimble.nim
 				mv dist/nimble/src/nimble bin/
 			fi
 		fi
