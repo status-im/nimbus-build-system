@@ -144,10 +144,10 @@ build_nim() {
 		./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
-			./koch tools -d:release --skipUserCfg --warnings:off --hints:off --styleCheck:off
+			./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
 			# We just want nimble
-			./koch nimble -d:release --skipUserCfg --warnings:off --hints:off --styleCheck:off
+			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		fi
 	else
 		# Git commits
@@ -275,7 +275,7 @@ build_nim() {
 
 			# Do we want Nimble in this quick build?
 			if [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
-				bin/nim c -d:release --noNimblePath --skipUserCfg --styleCheck:off dist/nimble/src/nimble.nim
+				bin/nim c -d:release --noNimblePath --skipUserCfg --skipParentCfg dist/nimble/src/nimble.nim
 				mv dist/nimble/src/nimble bin/
 			fi
 		fi
