@@ -68,7 +68,8 @@ nim_needs_rebuilding() {
 				git remote add extra "${NIM_COMMIT_REPO}"
 			fi
 			git fetch --all --tags --quiet
-			git checkout -q "${NIM_COMMIT}"
+			git checkout -q "${NIM_COMMIT}" ||
+			  { echo "Error: wrong NIM_COMMIT specified:'${NIM_COMMIT}'"; exit 1; }
 		fi
 		# In case the local branch diverged and a fast-forward merge is not possible.
 		git fetch || true
