@@ -172,7 +172,6 @@ You also need to specify it when using this non-default Nim compiler version:
 ### NIM_COMMIT_REPO
 
 `NIM_COMMIT` will try to fetch commits from the 
-[status-im fork](https://github.com/status-im/Nim), followed by the
 [official Nim language repo](https://github.com/nim-lang/Nim). If you want to
 use a fork from somewhere else, you can set this to the repo's URL.
 
