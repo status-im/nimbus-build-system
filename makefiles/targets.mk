@@ -106,7 +106,7 @@ update-test:
 update-common: | sanity-checks update-test
 	git submodule foreach --quiet 'git ls-files --exclude-standard --recurse-submodules -z -- ":!:.*" | xargs -0 rm -rf'
 	git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive || true
-	# changing URLs in a submodule's submodule means we have to sync and update twice
+    # changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
 	git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive
 	git submodule foreach --quiet --recursive 'git $(GIT_SUBMODULE_CONFIG) reset --quiet --hard'

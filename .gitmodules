@@ -1,5 +1,5 @@
 [submodule "vendor/Nim"]
 	path = vendor/Nim
-	url = https://github.com/status-im/Nim.git
+	url = https://github.com/nim-lang/Nim.git
 	ignore = dirty
-	branch = nimbus
+	branch = version-2-2

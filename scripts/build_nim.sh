@@ -49,7 +49,7 @@ nim_needs_rebuilding() {
 
 	if [[ ! -e "$NIM_DIR" ]]; then
 		# Shallow clone, optimised for the default NIM_COMMIT value.
-		git clone -q --depth=1 https://github.com/status-im/Nim.git "$NIM_DIR"
+		git clone -q --depth=1 https://github.com/nim-lang/Nim.git "$NIM_DIR"
 	fi
 
 	pushd "${NIM_DIR}" >/dev/null
@@ -58,7 +58,8 @@ nim_needs_rebuilding() {
 		git restore . 2>/dev/null || git reset --hard
 		if ! git checkout -q "${NIM_COMMIT}" 2>/dev/null; then
 			# Pay the price for a non-default NIM_COMMIT here, by fetching everything.
-			# (This includes upstream branches and tags that might be missing from our fork.)
+			# The "upstream" remote (pointing at the same location as the "origin")
+			# is kept for backward compatibility.
 			if ! git remote | grep -q "^upstream$"; then
 				git remote add upstream https://github.com/nim-lang/Nim
 			fi
