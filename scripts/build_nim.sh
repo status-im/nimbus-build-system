@@ -161,7 +161,7 @@ build_nim() {
 		# After this Nim commit, use csources v2
 		: ${CSOURCES_V2_START_COMMIT:=f7c203fb6c89b5cef83c4f326aeb23ef8c4a2c40}
 		: ${NIMBLE_REPO:=https://github.com/nim-lang/nimble.git}
-		: ${NIMBLE_COMMIT:=d13f3b8ce288b4dc8c34c219a4e050aaeaf43fc9} # 0.13.1
+		: ${NIMBLE_COMMIT:=b1dc28450f028aead0b7cf5da8adf2267db65f89} # 0.18.2
 
 		# Custom buildchain for older versions
 		# TODO Remove this once the default NIM_COMMIT supports `--skipIntegrityCheck`
