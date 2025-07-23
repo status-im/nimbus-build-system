@@ -152,8 +152,8 @@ build_nim() {
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
 			./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
-		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
-			# We just want nimble
+		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" && -z "${NIMBLE_COMMIT}" ]]; then
+			# We just want nimble (but only if not building custom NIMBLE_COMMIT later)
 			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		fi
 	fi
@@ -193,7 +193,7 @@ build_nim() {
 		rm -rf "${NIMBLE_BUILD_DIR}"
 	fi
 
-	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
+	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" || -n "${NIMBLE_COMMIT}" ]]; then
 		# Nimble needs a CA cert
 		rm -f bin/cacert.pem
 		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
