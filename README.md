@@ -182,6 +182,11 @@ compiler version:
 
 `make -j8 NIM_COMMIT="4561f01" NIM_COMMIT_REPO="https://github.com/myorg/my-nim-fork" nimbus_beacon_node`
 
+### NIMBLE_COMMIT 
+
+Build and use a different nimble version that the ones shipped with the built nim. 
+
+
 ### EXCLUDED_NIM_PACKAGES
 
 List of relative paths (incomplete ones also work) to Git submodules that

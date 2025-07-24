@@ -121,6 +121,8 @@ build_nim() {
 
 	# working directory
 	pushd "$NIM_DIR"
+	# Get absolute path for NIM_DIR for later use
+	NIM_DIR_ABS="$(pwd)"
 
 	# Otherwise, when updating from pre-v2.0.10 to v2.0.10 or later,
 	# https://github.com/nim-lang/Nim/issues/24173 occurs. Simulates
@@ -150,13 +152,48 @@ build_nim() {
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
 			./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
-		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
-			# We just want nimble
+		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" && -z "${NIMBLE_COMMIT}" ]]; then
+			# We just want nimble (but only if not building custom NIMBLE_COMMIT later)
 			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		fi
 	fi
 
-	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]]; then
+	# Handle custom NIMBLE_COMMIT if specified
+	if [[ -n "${NIMBLE_COMMIT}" ]]; then
+		echo "Building custom Nimble commit: ${NIMBLE_COMMIT}"
+		# Save current directory
+		ORIGINAL_DIR=$(pwd)
+		
+		# Clone Nimble repository in a temporary location
+		NIMBLE_BUILD_DIR="${NIM_DIR_ABS}/nimble_build_temp"
+		rm -rf "${NIMBLE_BUILD_DIR}"
+		git clone -q https://github.com/nim-lang/nimble.git "${NIMBLE_BUILD_DIR}"
+		
+		# Checkout the specified commit
+		pushd "${NIMBLE_BUILD_DIR}" >/dev/null
+		git checkout -q "${NIMBLE_COMMIT}" || { echo "Error: wrong NIMBLE_COMMIT specified:'${NIMBLE_COMMIT}'"; exit 1; }
+		git submodule update --init --recursive
+		
+		# Build Nimble using the just-built Nim
+		echo "Building Nimble..."
+		"${NIM_DIR_ABS}/bin/nim" c -d:release --noNimblePath src/nimble
+		
+		# Replace the existing nimble binary
+		if [[ -f "src/nimble${EXE_SUFFIX}" ]]; then
+			echo "Replacing nimble binary..."
+			rm -f "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
+			cp "src/nimble${EXE_SUFFIX}" "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
+		else
+			echo "Error: Nimble build failed"
+			exit 1
+		fi
+		
+		popd >/dev/null
+		# Clean up
+		rm -rf "${NIMBLE_BUILD_DIR}"
+	fi
+
+	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" || -n "${NIMBLE_COMMIT}" ]]; then
 		# Nimble needs a CA cert
 		rm -f bin/cacert.pem
 		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
