@@ -105,11 +105,11 @@ update-test:
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 update-common: | sanity-checks update-test
 	git submodule foreach --quiet 'git ls-files --exclude-standard --recurse-submodules -z -- ":!:.*" | xargs -0 rm -rf'
-	git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive || true
+	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive || true
     # changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
-	git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive
-	git submodule foreach --quiet --recursive 'git $(GIT_SUBMODULE_CONFIG) reset --quiet --hard'
+	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive
+	$(GIT_SUBMODULE_ENV) git submodule foreach --quiet --recursive 'git $(GIT_SUBMODULE_CONFIG) reset --quiet --hard'
 	find . -type d -name nimcache -print0 | xargs -0 rm -rf
 	$(GET_CURRENT_COMMIT_TIMESTAMP) > $(UPDATE_TIMESTAMP)
 	rm -rf $(NIMBLE_DIR)
