@@ -176,7 +176,7 @@ build_nim() {
 		
 		# Build Nimble using the just-built Nim
 		echo "Building Nimble..."
-		"${NIM_DIR_ABS}/bin/nim" c -d:release --noNimblePath src/nimble
+		"${NIM_DIR_ABS}/bin/nim" c -d:release --skipUserCfg --skipParentCfg --noNimblePath src/nimble
 		
 		# Replace the existing nimble binary
 		if [[ -f "src/nimble${EXE_SUFFIX}" ]]; then
