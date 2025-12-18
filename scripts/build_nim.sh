@@ -8,6 +8,27 @@
 
 set -eo pipefail
 
+# Run a command, capture its stdout+stderr and print it if the command fails.
+# This ensures we can suppress normal output but still show full logs on error.
+run_cmd() {
+	# Create a temporary file to capture output. Use mktemp for portability.
+	local _out
+	_out=$(mktemp -t build_nim.XXXXXX) || _out="/tmp/build_nim.$$"
+	# Run the command with all args, capturing stdout+stderr into the temp file.
+	if "$@" >"${_out}" 2>&1; then
+		rm -f "${_out}"
+		return 0
+	else
+		# Print contextual information and the full captured output to stderr.
+		echo "Error: command failed: $*" >&2
+		echo "---- begin command output ----" >&2
+		cat "${_out}" >&2 || true
+		echo "----  end command output  ----" >&2
+		rm -f "${_out}"
+		return 1
+	fi
+}
+
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
 
@@ -49,7 +70,7 @@ nim_needs_rebuilding() {
 
 	if [[ ! -e "$NIM_DIR" ]]; then
 		# Shallow clone, optimised for the default NIM_COMMIT value.
-		git clone -q --depth=1 https://github.com/nim-lang/Nim.git "$NIM_DIR"
+		run_cmd git clone -q --depth=1 https://github.com/nim-lang/Nim.git "$NIM_DIR"
 	fi
 
 	pushd "${NIM_DIR}" >/dev/null
@@ -68,16 +89,16 @@ nim_needs_rebuilding() {
 				git remote remove extra 2>/dev/null || true
 				git remote add extra "${NIM_COMMIT_REPO}"
 			fi
-			git fetch --all --tags --quiet
-			git checkout -q "${NIM_COMMIT}" ||
-			  { echo "Error: wrong NIM_COMMIT specified:'${NIM_COMMIT}'"; exit 1; }
+			run_cmd git fetch --all --tags --quiet
+			run_cmd git checkout -q "${NIM_COMMIT}" ||
+				{ echo "Error: wrong NIM_COMMIT specified:'${NIM_COMMIT}'"; exit 1; }
 		fi
 		# In case the local branch diverged and a fast-forward merge is not possible.
-		git fetch || true
-		git reset -q --hard origin/"${NIM_COMMIT}" 2>/dev/null || true
+		run_cmd git fetch || true
+		run_cmd git reset -q --hard origin/"${NIM_COMMIT}" 2>/dev/null || true
 		# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
-		git pull -q 2>/dev/null || true
-		git checkout -q "${NIM_COMMIT}"
+		run_cmd git pull -q 2>/dev/null || true
+		run_cmd git checkout -q "${NIM_COMMIT}"
 		# We can't use "rev-parse" here, because it would return the tag object's
 		# hash instead of the commit hash, when NIM_COMMIT is a tag.
 		NIM_COMMIT_HASH="$(git rev-list -n 1 "${NIM_COMMIT}")"
@@ -94,7 +115,7 @@ nim_needs_rebuilding() {
 	# Delete old Nim binaries, to put a limit on how much storage we use.
 	for F in "$(ls -t "${NIM_DIR}"/bin/nim_commit_* 2>/dev/null | tail -n +$((MAX_NIM_BINARIES + 1)))"; do
 		if [[ -e "${F}" ]]; then
-			rm "${F}"
+			rm -f "${F}"
 		fi
 	done
 
@@ -146,15 +167,15 @@ build_nim() {
 		# - NIMBLE_REPO from Nim/koch.nim (bundleNimbleExe)
 		# - NIMBLE_COMMIT from Nim/koch.nim (NimbleStableCommit)
 		. ci/funs.sh
-		NIMCORES=1 nimBuildCsourcesIfNeeded $UCPU
-		bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
-		./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+		NIMCORES=1 run_cmd nimBuildCsourcesIfNeeded $UCPU
+		run_cmd bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
+		run_cmd ./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
-			./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+			run_cmd ./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" && -z "${NIMBLE_COMMIT}" ]]; then
 			# We just want nimble (but only if not building custom NIMBLE_COMMIT later)
-			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+			run_cmd ./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		fi
 	fi
 
@@ -163,31 +184,31 @@ build_nim() {
 		echo "Building custom Nimble commit: ${NIMBLE_COMMIT}"
 		# Save current directory
 		ORIGINAL_DIR=$(pwd)
-		
+
 		# Clone Nimble repository in a temporary location
 		NIMBLE_BUILD_DIR="${NIM_DIR_ABS}/nimble_build_temp"
-		rm -rf "${NIMBLE_BUILD_DIR}"
-		git clone -q https://github.com/nim-lang/nimble.git "${NIMBLE_BUILD_DIR}"
-		
+		run_cmd rm -rf "${NIMBLE_BUILD_DIR}"
+		run_cmd git clone -q https://github.com/nim-lang/nimble.git "${NIMBLE_BUILD_DIR}"
+
 		# Checkout the specified commit
 		pushd "${NIMBLE_BUILD_DIR}" >/dev/null
-		git checkout -q "${NIMBLE_COMMIT}" || { echo "Error: wrong NIMBLE_COMMIT specified:'${NIMBLE_COMMIT}'"; exit 1; }
-		git submodule update --init --recursive
-		
+		run_cmd git checkout -q "${NIMBLE_COMMIT}" || { echo "Error: wrong NIMBLE_COMMIT specified:'${NIMBLE_COMMIT}'"; exit 1; }
+		run_cmd git submodule update --init --recursive
+
 		# Build Nimble using the just-built Nim
 		echo "Building Nimble..."
-		"${NIM_DIR_ABS}/bin/nim" c -d:release --skipUserCfg --skipParentCfg --noNimblePath src/nimble
-		
+		run_cmd "${NIM_DIR_ABS}/bin/nim" c -d:release --skipUserCfg --skipParentCfg --noNimblePath src/nimble
+
 		# Replace the existing nimble binary
 		if [[ -f "src/nimble${EXE_SUFFIX}" ]]; then
 			echo "Replacing nimble binary..."
-			rm -f "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
-			cp "src/nimble${EXE_SUFFIX}" "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
+			run_cmd rm -f "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
+			run_cmd cp "src/nimble${EXE_SUFFIX}" "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
 		else
 			echo "Error: Nimble build failed"
 			exit 1
 		fi
-		
+
 		popd >/dev/null
 		# Clean up
 		rm -rf "${NIMBLE_BUILD_DIR}"
@@ -203,15 +224,15 @@ build_nim() {
 	echo "${NIM_COMMIT_HASH}" > bin/last_built_commit
 
 	# create the symlink
-	mv bin/nim bin/nim_commit_"${NIM_COMMIT_HASH}"
-	ln -s nim_commit_"${NIM_COMMIT_HASH}" bin/nim${EXE_SUFFIX}
+	run_cmd mv bin/nim bin/nim_commit_"${NIM_COMMIT_HASH}"
+	run_cmd ln -s nim_commit_"${NIM_COMMIT_HASH}" bin/nim${EXE_SUFFIX}
 
 	# update the CI cache
 	popd # we were in $NIM_DIR
 	if [[ -n "$CI_CACHE" ]]; then
 		rm -rf "$CI_CACHE"
 		mkdir "$CI_CACHE"
-		cp "$NIM_DIR"/bin/* "$CI_CACHE"/
+		cp -a "$NIM_DIR"/bin/* "$CI_CACHE"/
 	fi
 }
 
