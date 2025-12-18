@@ -138,8 +138,6 @@ nim_needs_rebuilding() {
 
 build_nim() {
 	echo -e "$NIM_BUILD_MSG"
-	[[ "$V" == "0" ]] && exec &>/dev/null
-
 	# working directory
 	pushd "$NIM_DIR"
 	# Get absolute path for NIM_DIR for later use
