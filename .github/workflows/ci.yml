@@ -30,7 +30,7 @@ jobs:
           - target:
               os: macos
               cpu: amd64
-            builder: macos-13
+            builder: macos-14
           - target:
               os: macos
               cpu: arm64
