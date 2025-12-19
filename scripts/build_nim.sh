@@ -226,7 +226,7 @@ build_nim() {
 	run_cmd ln -s nim_commit_"${NIM_COMMIT_HASH}" bin/nim${EXE_SUFFIX}
 
 	# update the CI cache
-	popd # we were in $NIM_DIR
+	popd >/dev/null	# we were in $NIM_DIR
 	if [[ -n "$CI_CACHE" ]]; then
 		rm -rf "$CI_CACHE"
 		mkdir "$CI_CACHE"
