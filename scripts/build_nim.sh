@@ -8,24 +8,48 @@
 
 set -eo pipefail
 
-# Run a command, capture its stdout+stderr and print it if the command fails.
-# This ensures we can suppress normal output but still show full logs on error.
+## If `V` equals 1 we want verbose mode: stream command output to the
+## terminal directly. Otherwise capture all output to a single logfile
+## and only print it on error.
+USE_LOGFILE=1
+if [[ "${V:-0}" -eq 1 ]]; then
+	USE_LOGFILE=0
+else
+	LOGFILE=""
+	LOGFILE=$(mktemp -t build_nim.XXXXXX) || LOGFILE="/tmp/build_nim.$$"
+fi
+
+cleanup() {
+	local _rc=$?
+	if [[ ${_rc} -ne 0 && ${USE_LOGFILE} -eq 1 ]]; then
+		echo "---- Full log (captured output) ----" >&2
+		cat "${LOGFILE}" >&2 || true
+		echo "---- End full log ----" >&2
+	fi
+	if [[ ${USE_LOGFILE} -eq 1 ]]; then
+		rm -f "${LOGFILE}" || true
+	fi
+	return ${_rc}
+}
+trap cleanup EXIT
+
+# Run a command, either streaming output to the terminal (verbose mode),
+# or appending stdout+stderr to the logfile (captured mode).
 run_cmd() {
-	# Create a temporary file to capture output. Use mktemp for portability.
-	local _out
-	_out=$(mktemp -t build_nim.XXXXXX) || _out="/tmp/build_nim.$$"
-	# Run the command with all args, capturing stdout+stderr into the temp file.
-	if "$@" >"${_out}" 2>&1; then
-		rm -f "${_out}"
-		return 0
+	if [[ ${USE_LOGFILE} -eq 1 ]]; then
+		if "$@" >>"${LOGFILE}" 2>&1; then
+			return 0
+		else
+			echo "Error: command failed: $*" >&2
+			return 1
+		fi
 	else
-		# Print contextual information and the full captured output to stderr.
-		echo "Error: command failed: $*" >&2
-		echo "---- begin command output ----" >&2
-		cat "${_out}" >&2 || true
-		echo "----  end command output  ----" >&2
-		rm -f "${_out}"
-		return 1
+		if "$@"; then
+			return 0
+		else
+			echo "Error: command failed: $*" >&2
+			return 1
+		fi
 	fi
 }
 
@@ -73,7 +97,7 @@ nim_needs_rebuilding() {
 		run_cmd git clone -q --depth=1 https://github.com/nim-lang/Nim.git "$NIM_DIR"
 	fi
 
-	pushd "${NIM_DIR}" >/dev/null
+	run_cmd pushd "${NIM_DIR}"
 	if [[ -n "${NIM_COMMIT}" ]]; then
 		# support old Git versions, like the one from Ubuntu-18.04
 		git restore . 2>/dev/null || git reset --hard
@@ -106,7 +130,7 @@ nim_needs_rebuilding() {
 		# NIM_COMMIT is empty, so assume the commit we need is already checked out
 		NIM_COMMIT_HASH="$(git rev-list -n 1 HEAD)"
 	fi
-	popd >/dev/null
+	run_cmd popd
 
 	if [[ -n "$CI_CACHE" && -d "$CI_CACHE" ]]; then
 		cp -a "$CI_CACHE"/* "$NIM_DIR"/bin/ || true # let this one fail with an empty cache dir
@@ -139,7 +163,7 @@ nim_needs_rebuilding() {
 build_nim() {
 	echo -e "$NIM_BUILD_MSG"
 	# working directory
-	pushd "$NIM_DIR"
+	run_cmd pushd "$NIM_DIR"
 	# Get absolute path for NIM_DIR for later use
 	NIM_DIR_ABS="$(pwd)"
 
@@ -189,7 +213,7 @@ build_nim() {
 		run_cmd git clone -q https://github.com/nim-lang/nimble.git "${NIMBLE_BUILD_DIR}"
 
 		# Checkout the specified commit
-		pushd "${NIMBLE_BUILD_DIR}" >/dev/null
+		run_cmd pushd "${NIMBLE_BUILD_DIR}"
 		run_cmd git checkout -q "${NIMBLE_COMMIT}" || { echo "Error: wrong NIMBLE_COMMIT specified:'${NIMBLE_COMMIT}'"; exit 1; }
 		run_cmd git submodule update --init --recursive
 
@@ -207,7 +231,7 @@ build_nim() {
 			exit 1
 		fi
 
-		popd >/dev/null
+		run_cmd popd
 		# Clean up
 		rm -rf "${NIMBLE_BUILD_DIR}"
 	fi
@@ -226,7 +250,7 @@ build_nim() {
 	run_cmd ln -s nim_commit_"${NIM_COMMIT_HASH}" bin/nim${EXE_SUFFIX}
 
 	# update the CI cache
-	popd >/dev/null	# we were in $NIM_DIR
+	run_cmd popd	# we were in $NIM_DIR
 	if [[ -n "$CI_CACHE" ]]; then
 		rm -rf "$CI_CACHE"
 		mkdir "$CI_CACHE"
