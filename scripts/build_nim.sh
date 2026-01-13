@@ -174,8 +174,7 @@ build_nim() {
 	# When building Nimbus from a Nix derivation which adds this as part of
 	# a preBuild phase, do not use this hack, because it's both unnecessary
 	# and prevents Nim from building.
-	NIX_BUILD_TOP="${NIX_BUILD_TOP:-}"
-	if [[ "${NIX_BUILD_TOP}" != "/build" ]]; then
+	if [[ -z "${NIX_BUILD_TOP:-}" ]]; then
 		rm -rf dist/checksums
 	fi
 
