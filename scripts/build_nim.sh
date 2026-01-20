@@ -56,6 +56,12 @@ run_cmd() {
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
 
+# If NIMBLE_COMMIT is not defined at all use hardcoded default.
+# If it's defined but an empty string Nimble from Nim will be used.
+if [[ ! ${NIMBLE_COMMIT+SET} ]]; then
+	NIMBLE_COMMIT='9207e8b2bbdf66b5a4d1020214cff44d2d30df92' # 0.20.1
+fi
+
 # script arguments
 [[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
 NIM_DIR="$1"
@@ -194,8 +200,8 @@ build_nim() {
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
 			run_cmd ./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
-		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" && -z "${NIMBLE_COMMIT}" ]]; then
-			# We just want nimble (but only if not building custom NIMBLE_COMMIT later)
+		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]] && [[ -z "${NIMBLE_COMMIT}" ]]; then
+			# We just want default nimble (but only if NIMBLE_COMMIT is explicitly defined but empty)
 			run_cmd ./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
 		fi
 	fi
@@ -235,10 +241,10 @@ build_nim() {
 		rm -rf "${NIMBLE_BUILD_DIR}"
 	fi
 
-	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" || -n "${NIMBLE_COMMIT}" ]]; then
-		# Nimble needs a CA cert
-		rm -f bin/cacert.pem
-		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
+	# Nimble needs a CA cert
+	if [[ ! -r bin/cacert.pem ]] && [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" || -n "${NIMBLE_COMMIT}" ]]; then
+		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem \
+			|| echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
 	fi
 
 	# record the built commit
