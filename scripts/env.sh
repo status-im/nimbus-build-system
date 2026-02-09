@@ -63,11 +63,6 @@ nimble() {
 }
 $EXPORT_FUNC nimble
 
-add_submodule() {
-	"${ABS_PATH}/add_submodule.sh" "$@"
-}
-$EXPORT_FUNC add_submodule
-
 export NIMBUS_BUILD_SYSTEM=yes
 
 TOP_LEVEL_DIR="${ABS_PATH}/../../../" "${ABS_PATH}/create_nbs_paths.sh"
