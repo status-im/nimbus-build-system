@@ -76,7 +76,7 @@ in stdenv.mkDerivation rec {
     cp -r ${nimble}    dist/nimble
     cp -r ${checksums} dist/checksums
     cp -r ${csources}  ${csources.repo}
-    chmod 777 -R dist/nimble csources_v2
+    chmod 777 -R dist/nimble ${csources.repo}
     popd
   '';
 
