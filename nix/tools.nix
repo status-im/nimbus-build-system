@@ -11,7 +11,10 @@ in {
       matching = regex: lines: map (line: match regex line) lines;
       extractMatch = matches:
         let xs = flatten (remove null matches);
-        in if xs == [] then null else last xs;
+        in if xs == [] then
+          throw "findKeyValue: no match for regex '${regex}' in ${toString sourceFile}"
+        else
+          last xs;
     in
       extractMatch (matching regex (linesFrom sourceFile));
 }

@@ -4,8 +4,8 @@ let
   tools = pkgs.callPackage ./tools.nix {};
   inherit (tools) findKeyValue;
 
-  nbsVersion = findKeyValue "^ +NIMBLE_COMMIT='([a-f0-9]+)'.*$" ../scripts/build_nim.sh;
-  nimVersion = findKeyValue "^ +NimbleStableCommit = \"([a-f0-9]+)\".*$" ../vendor/Nim/koch.nim;
+  nbsVersion = findKeyValue "^[[:space:]]+NIMBLE_COMMIT='([a-f0-9]+)'.*$" ../scripts/build_nim.sh;
+  nimVersion = findKeyValue "^[[:space:]]+NimbleStableCommit = \"([a-f0-9]+)\".*$" ../vendor/Nim/koch.nim;
 in pkgs.fetchFromGitHub rec {
   name = "${owner}-${repo}-src{rev}";
   owner = "nim-lang";
