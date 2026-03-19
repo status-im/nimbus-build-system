@@ -43,9 +43,6 @@ in stdenv.mkDerivation rec {
     '';
   in with pkgs; [
     which makeWrapper fakeGit
-  ] ++ lib.optionals stdenv.isDarwin [
-    pkgs.darwin.cctools
-    darwin.apple_sdk.frameworks.Security
   ];
 
   enableParallelBuilding = true;
