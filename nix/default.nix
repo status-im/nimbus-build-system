@@ -43,9 +43,6 @@ in stdenv.mkDerivation rec {
     '';
   in with pkgs; [
     which makeWrapper fakeGit
-  ] ++ lib.optionals stdenv.isDarwin [
-    pkgs.darwin.cctools
-    darwin.apple_sdk.frameworks.Security
   ];
 
   enableParallelBuilding = true;
@@ -76,7 +73,7 @@ in stdenv.mkDerivation rec {
     cp -r ${nimble}    dist/nimble
     cp -r ${checksums} dist/checksums
     cp -r ${csources}  ${csources.repo}
-    chmod 777 -R dist/nimble csources_v2
+    chmod 777 -R dist/nimble ${csources.repo}
     popd
   '';
 

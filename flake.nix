@@ -1,7 +1,7 @@
 {
   description = "nimbus-build-system";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs?rev=ff0dbd94265ac470dda06a657d5fe49de93b4599";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs?rev=2a777ace4b722f2714cc06d596f2476ee628c04a";
 
   outputs = { self, nixpkgs }:
     let
