@@ -59,7 +59,7 @@ NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuildin
 # If NIMBLE_COMMIT is not defined at all use hardcoded default.
 # If it's defined but an empty string Nimble from Nim will be used.
 if [[ ! ${NIMBLE_COMMIT+SET} ]]; then
-	NIMBLE_COMMIT='9207e8b2bbdf66b5a4d1020214cff44d2d30df92' # 0.20.1
+	NIMBLE_COMMIT='42ef70c2102a942c46f13eb76872326edd525cec' # 0.22.3
 fi
 
 # script arguments
