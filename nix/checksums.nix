@@ -11,5 +11,5 @@ in pkgs.fetchFromGitHub rec {
   repo = "checksums";
   rev = if commit != null then commit else throw "No checksums version in ${toString sourceFile}";
   # WARNING: Requires manual updates when Nim compiler version changes.
-  hash = "sha256-xC11sD13OTMMUY4F5CrF1XxKSigLtIPt2XQCcQOFNdM=";
+  hash = "sha256-JZhWqn4SrAgNw/HLzBK0rrj3WzvJ3Tv1nuDMn83KoYY=";
 }
