@@ -25,6 +25,8 @@ Add this repository to your project as a Git submodule:
 
 ```bash
 git submodule add https://github.com/status-im/nimbus-build-system.git vendor/nimbus-build-system
+# specify a branch
+git config -f .gitmodules submodule.vendor/nimbus-build-system.branch master
 # hide submodule working tree changes in `git diff`
 git config -f .gitmodules submodule.vendor/nimbus-build-system.ignore untracked
 ```
