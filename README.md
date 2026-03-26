@@ -21,23 +21,14 @@ GNU Make, Bash and the usual POSIX utilities.
 
 ## Usage
 
-Add this repository to your project as a Git submodule. You can use our handy shell script:
-
-```bash
-curl -OLs https://raw.githubusercontent.com/status-im/nimbus-build-system/master/scripts/add_submodule.sh
-less add_submodule.sh # you do read random Internet scripts before running them, right?
-chmod 755 add_submodule.sh
-./add_submodule.sh status-im/nimbus-build-system
-```
-
-Or you can do it by hand:
+Add this repository to your project as a Git submodule:
 
 ```bash
 git submodule add https://github.com/status-im/nimbus-build-system.git vendor/nimbus-build-system
 # specify a branch
 git config -f .gitmodules submodule.vendor/nimbus-build-system.branch master
 # hide submodule working tree changes in `git diff`
-git config -f .gitmodules submodule.vendor/nimbus-build-system.ignore dirty
+git config -f .gitmodules submodule.vendor/nimbus-build-system.ignore untracked
 ```
 
 Write your own top-level Makefile, taking our
@@ -354,19 +345,6 @@ Windows-specific target. Downloads and unpacks in the "build" dir some DLLs we m
 Build "libminiupnpc.a" and "libnatpmp.a" from [nim-nat-traversal](https://github.com/status-im/nim-nat-traversal)'s submodules - not included in this repo.
 
 ## Scripts
-
-### add_submodule.sh
-
-Add a new Git submodule to your superproject, setting the branch to "master"
-and hiding submodule working tree changes in `git diff`.
-
-Usage: `./add_submodule.sh some/repo [destdir]` # "destdir" defaults to "vendor/repo"
-
-Examples:
-
-`./add_submodule.sh status-im/nimbus-build-system`
-
-`./vendor/nimbus-build-system/scripts/add_submodule.sh status-im/nim-nat-traversal`
 
 ### build_nim.sh
 
