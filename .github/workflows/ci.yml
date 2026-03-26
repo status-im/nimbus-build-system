@@ -54,6 +54,8 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
+          # https://documentation.ubuntu.com/ubuntu-for-developers/reference/availability/gcc/
+          # gcc-12 is the newest available GCC on the oldest Ubuntu LTS release (22.04 at the time of writing)
           sudo DEBIAN_FRONTEND='noninteractive' apt-get install \
             --no-install-recommends -yq gcc-12-multilib g++-12-multilib \
             libssl-dev:i386 linux-libc-dev:i386
