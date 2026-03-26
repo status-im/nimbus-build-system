@@ -148,13 +148,13 @@ build_nim() {
 		. ci/funs.sh
 		NIMCORES=1 nimBuildCsourcesIfNeeded $UCPU
 		bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
-		./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+		./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
-			./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+			./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
 		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" && -z "${NIMBLE_COMMIT}" ]]; then
 			# We just want nimble (but only if not building custom NIMBLE_COMMIT later)
-			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
 		fi
 	fi
 
