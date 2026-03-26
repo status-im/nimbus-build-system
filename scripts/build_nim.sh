@@ -8,8 +8,59 @@
 
 set -eo pipefail
 
+## If `V` equals 1 we want verbose mode: stream command output to the
+## terminal directly. Otherwise capture all output to a single logfile
+## and only print it on error.
+USE_LOGFILE=1
+if [[ "${V:-0}" -eq 1 ]]; then
+	USE_LOGFILE=0
+else
+	LOGFILE=""
+	LOGFILE=$(mktemp -t build_nim.XXXXXX) || LOGFILE="/tmp/build_nim.$$"
+fi
+
+cleanup() {
+	local _rc=$?
+	if [[ ${_rc} -ne 0 && ${USE_LOGFILE} -eq 1 ]]; then
+		echo "---- Full log (captured output) ----" >&2
+		cat "${LOGFILE}" >&2 || true
+		echo "---- End full log ----" >&2
+	fi
+	if [[ ${USE_LOGFILE} -eq 1 ]]; then
+		rm -f "${LOGFILE}" || true
+	fi
+	return ${_rc}
+}
+trap cleanup EXIT
+
+# Run a command, either streaming output to the terminal (verbose mode),
+# or appending stdout+stderr to the logfile (captured mode).
+run_cmd() {
+	if [[ ${USE_LOGFILE} -eq 1 ]]; then
+		if "$@" >>"${LOGFILE}" 2>&1; then
+			return 0
+		else
+			echo "Error: command failed: $*" >&2
+			return 1
+		fi
+	else
+		if "$@"; then
+			return 0
+		else
+			echo "Error: command failed: $*" >&2
+			return 1
+		fi
+	fi
+}
+
 # NIM_COMMIT could be a (partial) commit hash, a tag, a branch name, etc. Empty by default.
 NIM_COMMIT_HASH="" # full hash for NIM_COMMIT, retrieved in "nim_needs_rebuilding()"
+
+# If NIMBLE_COMMIT is not defined at all use hardcoded default.
+# If it's defined but an empty string Nimble from Nim will be used.
+if [[ ! ${NIMBLE_COMMIT+SET} ]]; then
+	NIMBLE_COMMIT='9207e8b2bbdf66b5a4d1020214cff44d2d30df92' # 0.20.1
+fi
 
 # script arguments
 [[ $# -ne 4 ]] && { echo "Usage: $0 nim_dir csources_dir nimble_dir ci_cache_dir"; exit 1; }
@@ -49,10 +100,10 @@ nim_needs_rebuilding() {
 
 	if [[ ! -e "$NIM_DIR" ]]; then
 		# Shallow clone, optimised for the default NIM_COMMIT value.
-		git clone -q --depth=1 https://github.com/nim-lang/Nim.git "$NIM_DIR"
+		run_cmd git clone -q --depth=1 https://github.com/nim-lang/Nim.git "$NIM_DIR"
 	fi
 
-	pushd "${NIM_DIR}" >/dev/null
+	run_cmd pushd "${NIM_DIR}"
 	if [[ -n "${NIM_COMMIT}" ]]; then
 		# support old Git versions, like the one from Ubuntu-18.04
 		git restore . 2>/dev/null || git reset --hard
@@ -68,16 +119,16 @@ nim_needs_rebuilding() {
 				git remote remove extra 2>/dev/null || true
 				git remote add extra "${NIM_COMMIT_REPO}"
 			fi
-			git fetch --all --tags --quiet
-			git checkout -q "${NIM_COMMIT}" ||
-			  { echo "Error: wrong NIM_COMMIT specified:'${NIM_COMMIT}'"; exit 1; }
+			run_cmd git fetch --all --tags --quiet
+			run_cmd git checkout -q "${NIM_COMMIT}" ||
+				{ echo "Error: wrong NIM_COMMIT specified:'${NIM_COMMIT}'"; exit 1; }
 		fi
 		# In case the local branch diverged and a fast-forward merge is not possible.
-		git fetch || true
-		git reset -q --hard origin/"${NIM_COMMIT}" 2>/dev/null || true
+		run_cmd git fetch || true
+		run_cmd git reset -q --hard origin/"${NIM_COMMIT}" 2>/dev/null || true
 		# In case NIM_COMMIT is a local branch that's behind the remote one it's tracking.
-		git pull -q 2>/dev/null || true
-		git checkout -q "${NIM_COMMIT}"
+		run_cmd git pull -q 2>/dev/null || true
+		run_cmd git checkout -q "${NIM_COMMIT}"
 		# We can't use "rev-parse" here, because it would return the tag object's
 		# hash instead of the commit hash, when NIM_COMMIT is a tag.
 		NIM_COMMIT_HASH="$(git rev-list -n 1 "${NIM_COMMIT}")"
@@ -85,7 +136,7 @@ nim_needs_rebuilding() {
 		# NIM_COMMIT is empty, so assume the commit we need is already checked out
 		NIM_COMMIT_HASH="$(git rev-list -n 1 HEAD)"
 	fi
-	popd >/dev/null
+	run_cmd popd
 
 	if [[ -n "$CI_CACHE" && -d "$CI_CACHE" ]]; then
 		cp -a "$CI_CACHE"/* "$NIM_DIR"/bin/ || true # let this one fail with an empty cache dir
@@ -94,7 +145,7 @@ nim_needs_rebuilding() {
 	# Delete old Nim binaries, to put a limit on how much storage we use.
 	for F in "$(ls -t "${NIM_DIR}"/bin/nim_commit_* 2>/dev/null | tail -n +$((MAX_NIM_BINARIES + 1)))"; do
 		if [[ -e "${F}" ]]; then
-			rm "${F}"
+			rm -f "${F}"
 		fi
 	done
 
@@ -117,10 +168,8 @@ nim_needs_rebuilding() {
 
 build_nim() {
 	echo -e "$NIM_BUILD_MSG"
-	[[ "$V" == "0" ]] && exec &>/dev/null
-
 	# working directory
-	pushd "$NIM_DIR"
+	run_cmd pushd "$NIM_DIR"
 	# Get absolute path for NIM_DIR for later use
 	NIM_DIR_ABS="$(pwd)"
 
@@ -131,8 +180,7 @@ build_nim() {
 	# When building Nimbus from a Nix derivation which adds this as part of
 	# a preBuild phase, do not use this hack, because it's both unnecessary
 	# and prevents Nim from building.
-	NIX_BUILD_TOP="${NIX_BUILD_TOP:-}"
-	if [[ "${NIX_BUILD_TOP}" != "/build" ]]; then
+	if [[ -z "${NIX_BUILD_TOP:-}" ]]; then
 		rm -rf dist/checksums
 	fi
 
@@ -146,6 +194,7 @@ build_nim() {
 		# - NIMBLE_REPO from Nim/koch.nim (bundleNimbleExe)
 		# - NIMBLE_COMMIT from Nim/koch.nim (NimbleStableCommit)
 		. ci/funs.sh
+<<<<<<< kochflags
 		NIMCORES=1 nimBuildCsourcesIfNeeded $UCPU
 		bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
 		./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
@@ -155,6 +204,17 @@ build_nim() {
 		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" && -z "${NIMBLE_COMMIT}" ]]; then
 			# We just want nimble (but only if not building custom NIMBLE_COMMIT later)
 			./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
+=======
+		NIMCORES=1 run_cmd nimBuildCsourcesIfNeeded $UCPU
+		run_cmd bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
+		run_cmd ./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
+			# We want tools
+			run_cmd ./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]] && [[ -z "${NIMBLE_COMMIT}" ]]; then
+			# We just want default nimble (but only if NIMBLE_COMMIT is explicitly defined but empty)
+			run_cmd ./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off
+>>>>>>> master
 		fi
 	fi
 
@@ -163,55 +223,55 @@ build_nim() {
 		echo "Building custom Nimble commit: ${NIMBLE_COMMIT}"
 		# Save current directory
 		ORIGINAL_DIR=$(pwd)
-		
+
 		# Clone Nimble repository in a temporary location
 		NIMBLE_BUILD_DIR="${NIM_DIR_ABS}/nimble_build_temp"
-		rm -rf "${NIMBLE_BUILD_DIR}"
-		git clone -q https://github.com/nim-lang/nimble.git "${NIMBLE_BUILD_DIR}"
-		
+		run_cmd rm -rf "${NIMBLE_BUILD_DIR}"
+		run_cmd git clone -q https://github.com/nim-lang/nimble.git "${NIMBLE_BUILD_DIR}"
+
 		# Checkout the specified commit
-		pushd "${NIMBLE_BUILD_DIR}" >/dev/null
-		git checkout -q "${NIMBLE_COMMIT}" || { echo "Error: wrong NIMBLE_COMMIT specified:'${NIMBLE_COMMIT}'"; exit 1; }
-		git submodule update --init --recursive
-		
+		run_cmd pushd "${NIMBLE_BUILD_DIR}"
+		run_cmd git checkout -q "${NIMBLE_COMMIT}" || { echo "Error: wrong NIMBLE_COMMIT specified:'${NIMBLE_COMMIT}'"; exit 1; }
+		run_cmd git submodule update --init --recursive
+
 		# Build Nimble using the just-built Nim
 		echo "Building Nimble..."
-		"${NIM_DIR_ABS}/bin/nim" c -d:release --skipUserCfg --skipParentCfg --noNimblePath src/nimble
-		
+		run_cmd "${NIM_DIR_ABS}/bin/nim" c -d:release --skipUserCfg --skipParentCfg --noNimblePath src/nimble
+
 		# Replace the existing nimble binary
 		if [[ -f "src/nimble${EXE_SUFFIX}" ]]; then
 			echo "Replacing nimble binary..."
-			rm -f "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
-			cp "src/nimble${EXE_SUFFIX}" "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
+			run_cmd rm -f "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
+			run_cmd cp "src/nimble${EXE_SUFFIX}" "${NIM_DIR_ABS}/bin/nimble${EXE_SUFFIX}"
 		else
 			echo "Error: Nimble build failed"
 			exit 1
 		fi
-		
-		popd >/dev/null
+
+		run_cmd popd
 		# Clean up
 		rm -rf "${NIMBLE_BUILD_DIR}"
 	fi
 
-	if [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" || -n "${NIMBLE_COMMIT}" ]]; then
-		# Nimble needs a CA cert
-		rm -f bin/cacert.pem
-		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem || echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
+	# Nimble needs a CA cert
+	if [[ ! -r bin/cacert.pem ]] && [[ "$QUICK_AND_DIRTY_COMPILER" == "0" || "${QUICK_AND_DIRTY_NIMBLE}" != "0" || -n "${NIMBLE_COMMIT}" ]]; then
+		curl -LsS -o bin/cacert.pem https://curl.se/ca/cacert.pem \
+			|| echo "Warning: 'curl' failed to download a CA cert needed by Nimble. Ignoring it."
 	fi
 
 	# record the built commit
 	echo "${NIM_COMMIT_HASH}" > bin/last_built_commit
 
 	# create the symlink
-	mv bin/nim bin/nim_commit_"${NIM_COMMIT_HASH}"
-	ln -s nim_commit_"${NIM_COMMIT_HASH}" bin/nim${EXE_SUFFIX}
+	run_cmd mv bin/nim bin/nim_commit_"${NIM_COMMIT_HASH}"
+	run_cmd ln -s nim_commit_"${NIM_COMMIT_HASH}" bin/nim${EXE_SUFFIX}
 
 	# update the CI cache
-	popd # we were in $NIM_DIR
+	run_cmd popd	# we were in $NIM_DIR
 	if [[ -n "$CI_CACHE" ]]; then
 		rm -rf "$CI_CACHE"
 		mkdir "$CI_CACHE"
-		cp "$NIM_DIR"/bin/* "$CI_CACHE"/
+		cp -a "$NIM_DIR"/bin/* "$CI_CACHE"/
 	fi
 }
 

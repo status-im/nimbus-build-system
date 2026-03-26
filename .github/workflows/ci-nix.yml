@@ -1,0 +1,39 @@
+name: CI / Nix
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - os: macos
+            cpu: arm64
+          - os: linux
+            cpu: amd64
+        include:
+          - target:
+              os: macos
+              cpu: arm64
+            runs_on: [self-hosted, macOS, ARM64]
+
+          - target:
+              os: linux
+              cpu: amd64
+            runs_on: [self-hosted, Linux, X64]
+
+    name: '${{ matrix.target.os }}-${{ matrix.target.cpu }} (Nim ${{ matrix.branch }})'
+    runs-on: ${{ matrix.runs_on }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Run Nix Flake build
+        shell: bash
+        run: nix build -L '.?submodules=1#nim'
