@@ -196,13 +196,13 @@ build_nim() {
 		. ci/funs.sh
 		NIMCORES=1 run_cmd nimBuildCsourcesIfNeeded $UCPU
 		run_cmd bin/nim c --noNimblePath --skipUserCfg --skipParentCfg --warnings:off --hints:off koch
-		run_cmd ./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
+		run_cmd ./koch --skipIntegrityCheck boot -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off -d:lto ${KOCHFLAGS}
 		if [[ "${QUICK_AND_DIRTY_COMPILER}" == "0" ]]; then
 			# We want tools
-			run_cmd ./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
+			run_cmd ./koch tools -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off -d:lto ${KOCHFLAGS}
 		elif [[ "${QUICK_AND_DIRTY_NIMBLE}" != "0" ]] && [[ -z "${NIMBLE_COMMIT}" ]]; then
 			# We just want default nimble (but only if NIMBLE_COMMIT is explicitly defined but empty)
-			run_cmd ./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off ${KOCHFLAGS}
+			run_cmd ./koch nimble -d:release --skipUserCfg --skipParentCfg --warnings:off --hints:off -d:lto ${KOCHFLAGS}
 		fi
 	fi
 
@@ -224,7 +224,7 @@ build_nim() {
 
 		# Build Nimble using the just-built Nim
 		echo "Building Nimble..."
-		run_cmd "${NIM_DIR_ABS}/bin/nim" c -d:release --skipUserCfg --skipParentCfg --noNimblePath src/nimble
+		run_cmd "${NIM_DIR_ABS}/bin/nim" c -d:release --skipUserCfg --skipParentCfg --noNimblePath -d:lto src/nimble
 
 		# Replace the existing nimble binary
 		if [[ -f "src/nimble${EXE_SUFFIX}" ]]; then
