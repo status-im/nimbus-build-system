@@ -28,7 +28,7 @@ jobs:
               cpu: amd64
             runs_on: [self-hosted, Linux, X64]
 
-    name: '${{ matrix.target.os }}-${{ matrix.target.cpu }} (Nim ${{ matrix.branch }})'
+    name: '${{ matrix.target.os }}-${{ matrix.target.cpu }} (Nix)'
     runs-on: ${{ matrix.runs_on }}
     steps:
       - uses: actions/checkout@v4
