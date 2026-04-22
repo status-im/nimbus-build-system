@@ -16,7 +16,7 @@ if [[ "${V:-0}" -eq 1 ]]; then
 	USE_LOGFILE=0
 else
 	LOGFILE=""
-	LOGFILE=$(mktemp -t build_nim.XXXXXX) || LOGFILE="/tmp/build_nim.$$"
+	LOGFILE=$(mktemp -t build_nim.XXXXXX) || LOGFILE="${TMPDIR:-/tmp}/build_nim.$$"
 fi
 
 cleanup() {
