@@ -90,11 +90,10 @@ build-nim: | sanity-checks
 # Check if the update might cause loss of work. Abort, if so, while allowing an override mechanism.
 update-test:
 	TEE_TO_TTY="cat"; if bash -c ": >/dev/tty" &>/dev/null; then TEE_TO_TTY="tee /dev/tty"; fi; \
-	COMMAND="git status --short --untracked-files=no --ignore-submodules=untracked"; \
+	COMMAND="git status --short --untracked-files=normal --ignore-submodules=untracked"; \
 	LINES=$$({ $${COMMAND} | grep 'vendor' && echo ^---top level || true; git submodule foreach --recursive --quiet "$${COMMAND} | grep . && echo ^---\$$name || true"; } | $${TEE_TO_TTY} | wc -l); \
 	if [[ "$${LINES}" -ne "0" && "$(OVERRIDE)" != "1" ]]; then echo -e "\nYou have uncommitted local changes which might be overwritten by the update. Aborting.\nIf you know better, you can use the 'update' target instead of 'update-dev'.\n"; exit 1; fi
 
-#- for each submodule, delete checked out files (that might prevent a fresh checkout); skip dotfiles
 #- in case of submodule URL changes, propagates that change in the parent repo's .git directory
 #- initialises and updates the Git submodules
 #- hard-resets the working copies of submodules
@@ -104,11 +103,10 @@ update-test:
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 update-common: | sanity-checks update-test
-	git submodule foreach --quiet 'git ls-files --exclude-standard --recurse-submodules -z -- ":!:.*" | xargs -0 rm -rf'
-	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive || true
+	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive --force || true
     # changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
-	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive
+	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive --force
 	$(GIT_SUBMODULE_ENV) git submodule foreach --quiet --recursive 'git $(GIT_SUBMODULE_CONFIG) reset --quiet --hard'
 	find . -type d -name nimcache -print0 | xargs -0 rm -rf
 	$(GET_CURRENT_COMMIT_TIMESTAMP) > $(UPDATE_TIMESTAMP)
