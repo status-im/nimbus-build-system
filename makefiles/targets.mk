@@ -103,9 +103,11 @@ update-test:
 #- allows parallel building with the '+' prefix
 #- rebuilds the Nim compiler if the corresponding submodule is updated
 update-common: | sanity-checks update-test
+	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive || \
 	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive --force || true
     # changing URLs in a submodule's submodule means we have to sync and update twice
 	git submodule sync --quiet --recursive
+	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive || \
 	$(GIT_SUBMODULE_ENV) git $(GIT_SUBMODULE_CONFIG) submodule update --init --recursive --force
 	$(GIT_SUBMODULE_ENV) git submodule foreach --quiet --recursive 'git $(GIT_SUBMODULE_CONFIG) reset --quiet --hard'
 	find . -type d -name nimcache -print0 | xargs -0 rm -rf
