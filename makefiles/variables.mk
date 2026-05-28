@@ -96,7 +96,7 @@ else
   NPROC_CMD := nproc
 endif
 
-GET_CURRENT_COMMIT_TIMESTAMP := git log --pretty=format:%cd -n 1 $(GIT_TIMESTAMP_ARG)
+GET_CURRENT_COMMIT_TIMESTAMP := git log --no-show-signature --pretty=format:%cd -n 1 $(GIT_TIMESTAMP_ARG)
 UPDATE_TIMESTAMP := .update.timestamp
 
 ifeq ($(BUILD_SYSTEM_DIR),)
