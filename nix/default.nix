@@ -47,15 +47,18 @@ in stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  # Avoid Nim cache permission errors.
-  XDG_CACHE_HOME = "/tmp";
-  NIMBLE_DIR = "/tmp";
-
   makeFlags = targets ++ [
     "V=${toString verbosity}"
     "QUICK_AND_DIRTY_COMPILER=${if quickAndDirty then "1" else "0"}"
     "QUICK_AND_DIRTY_NIMBLE=${if quickAndDirty then "1" else "0"}"
   ];
+
+  # Avoid Nim cache permission errors.
+  preConfigure = ''
+    export XDG_CACHE_HOME="$TMPDIR/.cache"
+    export NIMBLE_DIR="$TMPDIR/.nimble"
+    export NIMCACHE="$TMPDIR/nimcache"
+  '';
 
   # Generate the nimbus-build-system.paths file.
   patchPhase = ''
