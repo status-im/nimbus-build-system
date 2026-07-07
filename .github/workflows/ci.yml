@@ -17,8 +17,6 @@ jobs:
           - os: linux
             cpu: i386
           - os: macos
-            cpu: amd64
-          - os: macos
             cpu: arm64
           - os: windows
             cpu: amd64
@@ -74,7 +72,7 @@ jobs:
       - name: Restore llvm-mingw (Windows) from cache
         if: runner.os == 'Windows'
         id: windows-mingw-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: external/mingw-${{ matrix.target.cpu }}
           key: 'mingw-llvm-17-${{ matrix.target.cpu }}'
@@ -100,7 +98,7 @@ jobs:
       - name: Restore Nim DLLs dependencies (Windows) from cache
         if: runner.os == 'Windows'
         id: windows-dlls-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: external/dlls
           key: 'dlls'
