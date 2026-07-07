@@ -31,7 +31,7 @@ jobs:
     name: '${{ matrix.target.os }}-${{ matrix.target.cpu }} (Nix)'
     runs-on: ${{ matrix.runs_on }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
       - name: Run Nix Flake build
