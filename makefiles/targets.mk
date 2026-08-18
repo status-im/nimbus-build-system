@@ -147,7 +147,9 @@ endif
 #- depends on Git submodules being initialised
 #- fakes a Nimble package repository with the minimum info needed by the Nim compiler
 #  for runtime path (i.e.: the second line in $(NIMBLE_DIR)/pkgs/*/*.nimble-link)
+#- removes pkgs first in case vendor stuff was removed between branches
 $(NIMBLE_DIR):
+	rm -rf $(NIMBLE_DIR)/pkgs
 	mkdir -p $(NIMBLE_DIR)/pkgs
 	NIMBLE_DIR="$(CURDIR)/$(NIMBLE_DIR)" PWD_CMD="$(PWD)" EXCLUDED_NIM_PACKAGES="$(EXCLUDED_NIM_PACKAGES)" \
 		git submodule foreach --recursive --quiet '"$(CURDIR)/$(BUILD_SYSTEM_DIR)/scripts/create_nimble_link.sh" "$$sm_path"'
@@ -232,15 +234,6 @@ ifeq ($(OS), Windows_NT)
     endif
   endif
 
-  ifeq ($(ARCH), x86)
-    ROCKSDB_DIR := x86
-  endif
-  ifeq ($(ARCH), x64)
-    ROCKSDB_DIR := x64
-  endif
-
-  ROCKSDB_ARCHIVE := nimbus-deps.zip
-  ROCKSDB_URL := https://github.com/status-im/nimbus-deps/releases/download/rocksdb-9.1.0/$(ROCKSDB_ARCHIVE)
   CURL := curl -O -L
   UNZIP := unzip -o
 
@@ -249,9 +242,6 @@ ifeq ($(OS), Windows_NT)
 #- this is why we can't delete the whole "build" dir in the "clean" target
 fetch-dlls: | build
 	cd build && \
-		$(CURL) $(ROCKSDB_URL) && \
 		$(CURL) https://nim-lang.org/download/dlls.zip && \
-		$(UNZIP) $(ROCKSDB_ARCHIVE) && \
-		cp -a $(ROCKSDB_DIR)/*.dll . && \
 		$(UNZIP) dlls.zip
 endif
