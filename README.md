@@ -128,12 +128,6 @@ This is useful when you can't statically link Glibc because you use NSS function
 
 `make PARTIAL_STATIC_LINKING=1 beacon_node`
 
-### LINK_PCRE
-
-Link PCRE, defaults to 1.
-
-`make LINK_PCRE=0`
-
 ### QUICK_AND_DIRTY_COMPILER
 
 Skip some Nim compiler bootstrap iterations and tool building. Useful in
@@ -389,12 +383,6 @@ install:
 ```
 
 Notice how the number of Make jobs is set through the "MAKE" env var.
-
-### build_rocksdb.sh
-
-Builds RocksDB. No longer used.
-
-Usage: `./build_rocksdb.sh ci_cache_dir`
 
 ### create_nimble_link.sh
 
