@@ -148,15 +148,15 @@ Build and use a different Nim compiler version than the default one.
 
 Possible values: (partial) commit hashes, tags, branches and anything else recognised by `git checkout ...`.
 
-`make -j8 NIM_COMMIT="v1.2.6" build-nim`
+`make -j8 NIM_COMMIT="v2.2.12" build-nim`
 
 You also need to specify it when using this non-default Nim compiler version:
 
-`make -j8 NIM_COMMIT="v1.2.6" nimbus_beacon_node`
+`make -j8 NIM_COMMIT="v2.2.12" nimbus_beacon_node`
 
 ### NIM_COMMIT_REPO
 
-`NIM_COMMIT` will try to fetch commits from the 
+`NIM_COMMIT` will try to fetch commits from the
 [official Nim language repo](https://github.com/nim-lang/Nim). If you want to
 use a fork from somewhere else, you can set this to the repo's URL.
 
@@ -167,9 +167,9 @@ compiler version:
 
 `make -j8 NIM_COMMIT="4561f01" NIM_COMMIT_REPO="https://github.com/myorg/my-nim-fork" nimbus_beacon_node`
 
-### NIMBLE_COMMIT 
+### NIMBLE_COMMIT
 
-Build and use a different nimble version that the ones shipped with the built nim. 
+Build and use a different nimble version that the ones shipped with the built nim.
 
 
 ### EXCLUDED_NIM_PACKAGES
@@ -456,4 +456,3 @@ or
 * Apache License, Version 2.0, ([LICENSE-APACHEv2](LICENSE-APACHEv2) or http://www.apache.org/licenses/LICENSE-2.0)
 
 at your option. These files may not be copied, modified, or distributed except according to those terms.
-
