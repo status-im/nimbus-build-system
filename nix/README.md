@@ -31,10 +31,13 @@ nix run 'git+https://github.com/status-im/nimbus-build-system?submodules=1#'
 
 ## Updating
 
-When `vendor/Nim` is updated, or `NIMBLE_COMMIT` changed in `scripts/build_nim.sh` the hashes in following files might need updating:
+When `vendor/Nim` is updated, or `NIMBLE_COMMIT` changed in `scripts/build_nim.sh`, it is necessary to update the corresponding pinned inputs in `flake.nix` and run `nix flake lock` for following inputs:
 
-- `checksums.nix`
-- `csources.nix`
-- `nimble.nix`
+- `checksums`
+- `csources`
+- `nimble`
 
-The tricky part is that in order to force a hash check you need to use use `pkgs.lib.fakeHash` or just make an intentional typo and rebuild.
+Running flake check verifies input revisions against commit hashes parsed from Nim sources and `scripts/build_nim.sh`:
+```sh
+nix flake check -L '.?submodules=1'
+```

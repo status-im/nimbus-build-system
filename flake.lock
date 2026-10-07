@@ -1,5 +1,59 @@
 {
   "nodes": {
+    "checksums": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775198586,
+        "narHash": "sha256-EwGpWSzWeEt8KLracRUle8KFb/2c6Ndz1Sqm3FhBvRY=",
+        "owner": "nim-lang",
+        "repo": "checksums",
+        "rev": "5c132cd332cce5d64a0da9ac3e4c9664313dccb4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nim-lang",
+        "repo": "checksums",
+        "rev": "5c132cd332cce5d64a0da9ac3e4c9664313dccb4",
+        "type": "github"
+      }
+    },
+    "csources": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1762688095,
+        "narHash": "sha256-pTcm2y+HDOuTol8DyoJMOMHsUA6QrgwGdfcOu1NX4PU=",
+        "owner": "nim-lang",
+        "repo": "csources_v3",
+        "rev": "eeab3ac46e93f10efda8e58c4db02b9438319d71",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nim-lang",
+        "repo": "csources_v3",
+        "rev": "eeab3ac46e93f10efda8e58c4db02b9438319d71",
+        "type": "github"
+      }
+    },
+    "nimble": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774433142,
+        "narHash": "sha256-d9Ezmmz6QKPgx/21u/aUBx7GgXaJzDuFu/gxtj6OVE8=",
+        "ref": "refs/heads/master",
+        "rev": "42ef70c2102a942c46f13eb76872326edd525cec",
+        "shallow": true,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/nim-lang/nimble"
+      },
+      "original": {
+        "rev": "42ef70c2102a942c46f13eb76872326edd525cec",
+        "shallow": true,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/nim-lang/nimble"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1768818593,
@@ -18,6 +72,9 @@
     },
     "root": {
       "inputs": {
+        "checksums": "checksums",
+        "csources": "csources",
+        "nimble": "nimble",
         "nixpkgs": "nixpkgs"
       }
     }

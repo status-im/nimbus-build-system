@@ -2,6 +2,9 @@
   pkgs ? import <nixpkgs> { },
   # Source code of this repo.
   src ? ../.,
+  nimble,
+  checksums,
+  csources,
   # Options: nimbus_light_client, nimbus_validator_client, nimbus_signing_node, all
   targets ? ["build-nim"],
   # Options: 0,1,2
@@ -22,10 +25,6 @@ assert pkgs.lib.assertMsg ((src.submodules or true) == true)
 
 let
   inherit (pkgs) stdenv lib writeScriptBin callPackage;
-
-  nimble = callPackage ./nimble.nix {};
-  checksums = callPackage ./checksums.nix {};
-  csources = callPackage ./csources.nix {};
 
   revision = lib.substring 0 8 (src.rev or src.dirtyRev or "unknown");
 in stdenv.mkDerivation rec {
@@ -75,8 +74,8 @@ in stdenv.mkDerivation rec {
     mkdir dist
     cp -r ${nimble}    dist/nimble
     cp -r ${checksums} dist/checksums
-    cp -r ${csources}  ${csources.repo}
-    chmod 777 -R dist/nimble ${csources.repo}
+    cp -r ${csources} csources_v3
+    chmod 777 -R dist/nimble csources_v3
     popd
   '';
 
