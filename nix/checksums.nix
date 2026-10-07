@@ -5,11 +5,10 @@ let
   sourceFile = ../vendor/Nim/koch.nim;
 
   commit = tools.findKeyValue "^ +ChecksumsStableCommit = \"([a-f0-9]+)\".*$" sourceFile;
-in pkgs.fetchFromGitHub rec {
-  name = "${owner}-${repo}-src-${rev}";
+# fetchTree with type=github necessary for access-tokens auth to avoid GH throttling.
+in builtins.fetchTree {
+  type = "github";
   owner = "nim-lang";
   repo = "checksums";
   rev = if commit != null then commit else throw "No checksums version in ${toString sourceFile}";
-  # WARNING: Requires manual updates when Nim compiler version changes.
-  hash = "sha256-EwGpWSzWeEt8KLracRUle8KFb/2c6Ndz1Sqm3FhBvRY=";
 }
